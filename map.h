@@ -2,6 +2,7 @@
 #define _MAP_H_
 
 #include "common.h"
+#include "util.h"
 #include "robot.h"
 #include "item.h"
 #include "port.h"

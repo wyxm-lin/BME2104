@@ -2,6 +2,7 @@
 #define _PORT_H_
 
 #include "common.h"
+#include "util.h"
 
 class Port {
 public:
