@@ -1,10 +1,14 @@
 #ifndef _ROBOT_H_
 #define _ROBOT_H_
 
+using std::vector;
+
 class Robot {
 public:
     int id, nowx, nowy;
-    bool IsCarry, IsAvailable;
+    int targetX, targetY;
+    bool IsCarry, IsAvailable, IsWorking;
+    vector <int> path;
 
     /**
     * @brief Update Robot info each frame
