@@ -102,7 +102,7 @@ void Map::RunByFrame() {
 void Map::ItemTimeOutDisappear(int frameID) {
     while(ItemList.size()) {
         Item it = ItemList.front();
-        if(it.BirthFrame + ExistFrame < frameID) { //TODO < or <=?
+        if(it.BirthFrame + ExistFrame <= frameID) {
             ItemValue[it.x][it.y] = 0;
             ItemList.pop();
         }
