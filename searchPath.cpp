@@ -34,7 +34,8 @@ void astar(Map &BME2104) {
                 if(BME2104.map[nextX][nextY] == WALL){  // wall
                     continue;
                 }
-                if(find(closeList.begin(), closeList.end(), std::make_pair(nextX, nextY)) != closeList.end()){  // in closeList
+                Node use4Search = Node(nextX, nextY, now.g + 1, abs(nextX - targetX) + abs(nextY - targetY), i);   // only x and y are used here
+                if(find(closeList.begin(), closeList.end(), use4Search) != closeList.end()){  // in closeList
                     continue;
                 }
                 if(now.isVisited){

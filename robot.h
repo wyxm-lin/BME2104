@@ -1,6 +1,8 @@
 #ifndef _ROBOT_H_
 #define _ROBOT_H_
 
+#include <vector>
+
 using std::vector;
 
 class Robot {
