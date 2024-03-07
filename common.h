@@ -24,4 +24,11 @@ enum ShipStatus {
     WAITING = 2 // the ship is waiting out of the port
 };
 
+enum MoveDirection {
+    RIGHT = 0,
+    LEFT = 1,
+    UP = 2,
+    DOWN = 3
+};
+
 #endif
