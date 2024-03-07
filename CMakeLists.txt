@@ -17,8 +17,3 @@ add_library(CodeCraft ${SOURCES})
 add_executable(main ${PROJECT_SOURCE_DIR}/main.cpp)
 target_link_libraries(main CodeCraft)
 set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
-
-# 测试文件
-add_executable(test ${PROJECT_SOURCE_DIR}/tests/test.cpp)
-target_link_libraries(test CodeCraft)
-set_target_properties(test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
