@@ -5,7 +5,13 @@
 
 class Ship {
 public:
-    int id, capacity;
+    int id, capacity, target;
+    ShipStatus status;
+
+    /**
+     * @brief Update ship info
+    */
+    void update(ShipStatus sta, int targ);
 };
 
 #endif

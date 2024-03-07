@@ -26,7 +26,7 @@ void Map::Init() {
                 map[i][j] = EMPTY;
                 ++robotid;
                 robot[robotid].id = robotid;
-                robot[robotid].update(i, j, false, false);
+                robot[robotid].update(i, j, false, true);
                 break;
             case 'B':
                 map[i][j] = PORT;
@@ -64,8 +64,50 @@ void Map::Init() {
 }
 
 void Map::RunByFrame() {
-    int frameID = 0;
-    while(frameID <= FrameLimit) {
-        
+    int frameID = 0, nowamoney = 0;
+    while(frameID < FrameLimit) {
+        cin >> frameID >> nowamoney;
+        int NewItemCount;
+        cin >> NewItemCount;
+        for(int i = 1; i <= NewItemCount; i++) {
+            int x, y, val;
+            scanf("%d%d%d", &x, &y, &val);
+            ItemList.emplace(Item(frameID, x, y, val));
+            ItemValue[x][y] = val;
+        }
+        // Finish new item input
+        ItemTimeOutDisappear(frameID);
+        // Kick out disappeared items
+
+        for(int i = 0; i < RobotNumber; i++) {
+            int carry, x, y, status;
+            cin >> carry >> x >> y >> status;
+            robot[i].update(x, y, carry, status);
+        }
+        // Robots Data Update
+
+        for(int i = 0; i < ShipNumber; i++) {
+            int status, tarid;
+            cin >> status >> tarid;
+            ship[i].update((ShipStatus)status, tarid);
+            // the status is accordingly assigned to integers, in 'common.h'
+        }
+        // Ship Data Update
+        string OKstring;
+        cin >> OKstring;
+        // Read 'OK'
+    }
+}
+
+void Map::ItemTimeOutDisappear(int frameID) {
+    while(ItemList.size()) {
+        Item it = ItemList.front();
+        if(it.BirthFrame + ExistFrame < frameID) { //TODO < or <=?
+            ItemValue[it.x][it.y] = 0;
+            ItemList.pop();
+        }
+        else {
+            break;
+        }
     }
 }
