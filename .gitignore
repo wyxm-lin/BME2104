@@ -2,3 +2,8 @@
 /build
 main
 /bin
+/reply
+/replay
+cp.sh
+run.sh
+.gitignore
