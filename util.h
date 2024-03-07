@@ -6,13 +6,22 @@
 */
 
 #include "common.h"
-#include <iostream>
-#include <cstdio>
-#include <queue>
-#include <vector>
 
-bool in(int x, int y);
+inline bool in (int x, int y) {
+    return x >= 0 && x < MapSize && y >= 0 && y < MapSize;
+}
 
-// FIXME consider move the function "reachable" from the class 'Map' to here
+inline bool reachable (MapStatus x, MapStatus y) {
+    if (x == WALL || y == WALL)
+        return false;
+    if (x == y)
+        return true;
+    else if (x == EMPTY && y == WATER)
+        return true;
+    else if (x == WATER && y == EMPTY)
+        return true;
+    else
+        return false;
+}
 
 #endif

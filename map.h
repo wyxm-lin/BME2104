@@ -18,6 +18,8 @@ public:
     Robot robot[RobotNumber];
     Port port[PortNumber];
     Ship ship[ShipNumber];
+    int Color[MapSize][MapSize];
+    int ColorCount;
 
     /**
     * @brief Initize the map, stage preprocess
@@ -33,6 +35,11 @@ public:
     * @brief Run the program frame by frame
     */
     void RunByFrame();
+
+    /**
+     * @brief Color the map
+    */
+    void ColorMap();
 
 };
 
