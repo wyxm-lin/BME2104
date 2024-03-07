@@ -13,10 +13,15 @@ public:
     Port port[PortNumber];
     Ship ship[ShipNumber];
 
-    /*
+    /**
     * @brief Initize the map, stage preprocess
     */
     void Init();
+
+    /**
+    * @brief Run the program frame by frame
+    */
+    void RunByFrame();
 
 };
 

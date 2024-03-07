@@ -1,9 +1,10 @@
-
-#include "demo.h"
+#include "map.h"
 
 using namespace std;
 
 int main() {
-    hello_world();
+    Map BME2104;
+    BME2104.Init();
+    BME2104.RunByFrame();
     return 0;
 }

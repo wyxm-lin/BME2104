@@ -62,3 +62,10 @@ void Map::Init() {
     // End stage preprocess here
     // endl would automatically fflush the std output
 }
+
+void Map::RunByFrame() {
+    int frameID = 0;
+    while(frameID <= FrameLimit) {
+        
+    }
+}

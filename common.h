@@ -17,7 +17,7 @@ enum MapStatus {
 enum ShipStatus {
     MOVING = 0,
     FINISHED = 1,
-    WATING = 2
+    WAITING = 2
 };
 
 #endif
