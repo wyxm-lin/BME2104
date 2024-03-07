@@ -1,8 +1,9 @@
-#include <iostream>
+
+#include "demo.h"
 
 using namespace std;
 
 int main() {
-    printf("Hello CodeCraft\n");
+    hello_world();
     return 0;
 }
