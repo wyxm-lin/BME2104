@@ -6,4 +6,4 @@ main
 /replay
 cp.sh
 run.sh
-.gitignore
+do.sh
