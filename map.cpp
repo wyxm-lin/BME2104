@@ -71,7 +71,7 @@ void Map::RunByFrame() {
         cin >> NewItemCount;
         for(int i = 1; i <= NewItemCount; i++) {
             int x, y, val;
-            scanf("%d%d%d", &x, &y, &val);
+            cin >> x >> y >> val;
             ItemList.emplace(Item(frameID, x, y, val));
             ItemValue[x][y] = val;
         }

@@ -8,6 +8,9 @@ if (!WIN32)
     link_libraries(pthread rt m)
 endif (!WIN32)
 
+
+add_compile_options(-O2)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GLOB SOURCES "*.h" "*.cpp")
