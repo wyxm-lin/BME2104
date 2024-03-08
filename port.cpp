@@ -21,7 +21,7 @@ void Port::PortDisInit(Atlas* atlas) {
         q.pop();
         for (int k = 0; k < 4; k++) {
             int nx = x_ + dx[k], ny = y_ + dy[k];
-            if (in(nx, ny) && dis[nx][ny] == -1 && atlas->color[nx][ny] == atlas->color[x_][y_]) {
+            if (valid(nx, ny) && dis[nx][ny] == -1 && atlas->color[nx][ny] == atlas->color[x_][y_]) {
                 dis[nx][ny] = dis[x_][y_] + 1;
                 q.push({nx, ny});
             }

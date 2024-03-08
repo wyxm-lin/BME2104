@@ -28,7 +28,7 @@ void Atlas::ColorAtlas() {
                     q.pop();
                     for (int k = 0; k < 4; k++) {
                         int x = now.first + dx[k], y = now.second + dy[k];
-                        if (in(x, y) && color[x][y] == 0 && reachable(atlas[now.first][now.second], atlas[x][y])) {
+                        if (valid(x, y) && color[x][y] == 0 && reachable(atlas[now.first][now.second], atlas[x][y])) {
                             color[x][y] = ColorCount;
                             q.push({x, y});
                         }

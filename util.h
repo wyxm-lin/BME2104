@@ -7,7 +7,7 @@
 
 #include "common.h"
 
-inline bool in (int x, int y) {
+inline bool valid (int x, int y) {
     return x >= 0 && x < MapSize && y >= 0 && y < MapSize;
 }
 

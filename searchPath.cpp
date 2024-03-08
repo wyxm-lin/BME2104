@@ -32,7 +32,7 @@ void astar(Robot (&robot)[RobotNumber], Atlas& atlas) {
             }
             for (int i = 0; i < 4; i++) {
                 int nextX = x + dx[i], nextY = y + dy[i];
-                if (in(nextX, nextY) == false) { // out of range
+                if (valid(nextX, nextY) == false) { // out of range
                         continue;
                 }
                 if (atlas.atlas[nextX][nextY] == WALL) {  // wall
