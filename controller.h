@@ -20,6 +20,8 @@ public:
     queue <Item> ItemList;
     Item ItemMap[MapSize][MapSize];
 
+    //ItemMap should be cleared after the robot actually take the item, it is a up-to-time map
+
     Controller() = default;
     ~Controller() = default;
 
@@ -54,7 +56,7 @@ public:
     void Schedule();
 
     /**
-     * @brief Print
+     * @brief Print the info - interacte with the grader
     */
     void Print();
 };

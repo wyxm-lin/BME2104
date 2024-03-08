@@ -15,15 +15,16 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
     vector <Order> ords[RobotNumber]; 
     while(Q.size()) {
         Item it = Q.front(); Q.pop();
-        if(it != ItemMap[it.x][it.y]) continue;
-        if(it.isbooked()) continue;
+        if(it != ItemMap[it.x][it.y]) continue; // this item has been taken, just kick out
+        // if(it.isbooked()) continue;
+        if(ItemMap[it.x][it.y].isbooked()) continue;
         int aimport = it.destination;
         for(int i = 0; i < RobotNumber; i++) {
             if(robot[i].UnableTakeOrder()) continue;
             if(it.value < robot[i].ValueLimit) continue;
             Order ord;
             ord.DisItemToPort = port[aimport].GetDis(it.x, it.y);
-            // ord.DisRobotToItem = // TODO
+            // ord.DisRobotToItem =  TODO
             ord.PortId = aimport;
             ord.RobotId = i;
             ord.val = (double)it.value / (ord.DisItemToPort + ord.DisRobotToItem);

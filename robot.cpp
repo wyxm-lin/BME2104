@@ -11,7 +11,8 @@ void Robot::update(int x, int y, bool carry, bool available) {
 }
 
 bool Robot::UnableTakeOrder() {
-    if(IsAvailable == false || IsCarry == true) return true;
+    if(IsAvailable == false) return true;
+    if(IsWorking == true) return true;
     return false;
 }
 
