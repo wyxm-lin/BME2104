@@ -48,6 +48,11 @@ public:
     */
     void ItemUpdateByFrame(int frameID);
 
+    /**
+     * @brief output a certain robot move by its path
+     * @param robot the robot to be printed
+     */
+    void printRobotMove(Robot robot, int id);
 };
 
 #endif

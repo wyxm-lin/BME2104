@@ -1,5 +1,6 @@
 #include "util.h"
 #include "robot.h"
+#include "searchPath.h"
 
 void Robot::update(int x, int y, bool carry, bool available) {
     nowx = x, nowy = y;
@@ -15,6 +16,7 @@ void Robot::TakeOrder(Item it) {
     targetX = it.x;
     targetY = it.y;
     IsWorking = true;
+    IsPathGenerated = false;
 }
 
 void Robot::RobotPrintPath() {

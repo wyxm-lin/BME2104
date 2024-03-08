@@ -12,8 +12,11 @@ public:
     int id, nowx, nowy;
     int targetX, targetY;
     bool IsCarry, IsAvailable, IsWorking;
+    bool IsPathGenerated;
+
     int ValueLimit; // when value >= ValueLimit, this robot work
     vector <pair<int, int> > path;
+    int pathIndex;
 
     Robot() = default;
     ~Robot() = default;

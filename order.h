@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "item.h"
+#include "searchPath.h"
 
 
 class Robot;

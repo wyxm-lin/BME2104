@@ -113,8 +113,41 @@ void Controller::RunByFrame() {
 
         GenerateOrders(robot, ItemList, port, ItemMap);
 
-
+        for(int i = 0; i < RobotNumber; i++) {
+            if (robot[i].IsWorking == false)
+                continue;
+            if (robot[i].IsPathGenerated == false) {
+                robot[i].IsPathGenerated = true;
+                SearchPath(robot[i], atlas);
+                robot[i].pathIndex = 0; // initialize the pathIndex
+            }
+            printRobotMove(robot[i], i);
+        }
     }
+}
+
+void Controller::printRobotMove(Robot robot, int id) {
+    if (robot.pathIndex >= robot.path.size()) { // the robot has reached the target
+        if (robot.pathIndex == robot.path.size()) {
+            cout << "get " << id << endl;
+        }
+        return;
+    }
+    pair<int, int> next = robot.path[robot.pathIndex];
+    cout << "move " << id << " ";
+    if (next.first == robot.nowx + 1) {
+        cout << "3" << endl;
+    }
+    else if (next.first == robot.nowx - 1) {
+        cout << "2" << endl;
+    }
+    else if (next.second == robot.nowy + 1) {
+        cout << "0" << endl;
+    }
+    else if (next.second == robot.nowy - 1) {
+        cout << "1" << endl;
+    }
+    robot.pathIndex ++;
 }
 
 void Controller::ItemTimeOutDisappear(int frameID) {
