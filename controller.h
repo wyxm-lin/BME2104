@@ -7,6 +7,7 @@
 #include "port.h"
 #include "ship.h"
 #include "atlas.h"
+#include "order.h"
 
 using std::queue;
 
@@ -16,8 +17,8 @@ public:
     Port port[PortNumber];
     Ship ship[ShipNumber];
     Atlas atlas;
-    queue<Item> ItemList;
-    int ItemValue[MapSize][MapSize];
+    queue <Item> ItemList;
+    Item ItemMap[MapSize][MapSize];
 
     Controller() = default;
     ~Controller() = default;
@@ -42,6 +43,10 @@ public:
     */
     void RunByFrame();
 
+    /**
+     * @brief Update Item infomation according to the input
+    */
+    void ItemUpdateByFrame(int frameID);
 
 };
 

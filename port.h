@@ -20,6 +20,10 @@ public:
      */
     void PortDisInit(Atlas* atlas);
 
+    int GetDis(int aimX, int aimY) {
+        return dis[aimX][aimY];
+    }
+
     /**
      * @brief below are the functions to test the correctness of the atlas
     */

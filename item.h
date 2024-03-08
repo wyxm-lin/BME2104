@@ -4,13 +4,21 @@
 class Item {
 public:
     int BirthFrame, x, y, value;
+    int destination;
+    bool booked;
+    bool operator != (const Item &a) const;
     /**
      * @brief Construct function with full parmas
     */
-    Item(int fream, int x, int y, int val);
+    Item(int frame, int x, int y, int val, int des);
+
+    bool isbooked();
+    void book();
 
     Item() = default;
     ~Item() = default;
 };
+
+const Item EmptyItem = Item(0, 0, 0, 0, 0);
 
 #endif
