@@ -6,6 +6,17 @@ void Robot::update(int x, int y, bool carry, bool available) {
     IsCarry = carry, IsAvailable = available;
 }
 
+bool Robot::UnableTakeOrder() {
+    if(IsAvailable == false || IsCarry == true) return true;
+    return false;
+}
+
+void Robot::TakeOrder(Item it) {
+    targetX = it.x;
+    targetY = it.y;
+    IsWorking = true;
+}
+
 void Robot::RobotPrintPath() {
     using std::cout;
     using std::endl;

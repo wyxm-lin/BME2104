@@ -1,6 +1,7 @@
 #include "util.h"
 #include "controller.h"
 
+
 using std::string;
 using std::cin;
 using std::cout;
@@ -56,6 +57,8 @@ void Controller::Init() {
         ship[i].capacity = cap;
     }
 
+    PreProcess();
+
     string OKstring;
     cin >> OKstring;
     cout << "OK" << endl;
@@ -63,21 +66,32 @@ void Controller::Init() {
     // endl would automatically fflush the std output
 }
 
+void Controller::ItemUpdateByFrame(int frameID) {
+    int NewItemCount;
+    cin >> NewItemCount;
+    for(int i = 1; i <= NewItemCount; i++) {
+        int x, y, val;
+        cin >> x >> y >> val;
+        int aimid = -1, nowadis = INF;
+        for(int j = 0; j < PortNumber; j++) {
+            int disj = port[j].GetDis(x, y);
+            if(disj == -1) continue; //unreachable
+            if(disj < nowadis) nowadis = disj , aimid = -1;
+        }
+        if(aimid == -1) continue;
+        ItemList.emplace(Item(frameID, x, y, val, aimid));
+        ItemMap[x][y] = Item(frameID, x, y, val, aimid);
+    }
+    // Finish new item input
+    ItemTimeOutDisappear(frameID);
+    // Kick out disappeared items
+}
+
 void Controller::RunByFrame() {
     int frameID = 0, nowamoney = 0;
     while(frameID < FrameLimit) {
         cin >> frameID >> nowamoney;
-        int NewItemCount;
-        cin >> NewItemCount;
-        for(int i = 1; i <= NewItemCount; i++) {
-            int x, y, val;
-            cin >> x >> y >> val;
-            ItemList.emplace(Item(frameID, x, y, val));
-            ItemValue[x][y] = val;
-        }
-        // Finish new item input
-        ItemTimeOutDisappear(frameID);
-        // Kick out disappeared items
+        ItemUpdateByFrame(frameID);
 
         for(int i = 0; i < RobotNumber; i++) {
             int carry, x, y, status;
@@ -96,6 +110,10 @@ void Controller::RunByFrame() {
         string OKstring;
         cin >> OKstring;
         // Read 'OK'
+
+        GenerateOrders(robot, ItemList, port, ItemMap);
+
+
     }
 }
 
@@ -103,7 +121,7 @@ void Controller::ItemTimeOutDisappear(int frameID) {
     while(ItemList.size()) {
         Item it = ItemList.front();
         if(it.BirthFrame + ExistFrame <= frameID) {
-            ItemValue[it.x][it.y] = 0;
+            ItemMap[it.x][it.y] = EmptyItem;
             ItemList.pop();
         }
         else {

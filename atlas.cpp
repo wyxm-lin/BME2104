@@ -20,7 +20,7 @@ void Atlas::ColorAtlas() {
         for (int j = 0; j < MapSize; j++) {
             if (color[i][j] == 0) {
                 ColorCount++;
-                queue<pair<int, int>> q;
+                queue<pair<int, int> > q;
                 q.push({i, j});
                 color[i][j] = ColorCount;
                 while (q.size()) {
