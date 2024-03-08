@@ -76,7 +76,7 @@ void Controller::ItemUpdateByFrame(int frameID) {
         for(int j = 0; j < PortNumber; j++) {
             int disj = port[j].GetDis(x, y);
             if(disj == -1) continue; //unreachable
-            if(disj < nowadis) nowadis = disj , aimid = -1;
+            if(disj < nowadis) nowadis = disj , aimid = j;
         }
         if(aimid == -1) continue;
         ItemList.emplace(Item(frameID, x, y, val, aimid));
