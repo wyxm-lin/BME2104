@@ -16,9 +16,9 @@ inline bool reachable (MapStatus x, MapStatus y) {
         return false;
     if (x == y)
         return true;
-    else if (x == EMPTY && y == WATER)
+    else if (x == EMPTY && y == PORT)
         return true;
-    else if (x == WATER && y == EMPTY)
+    else if (x == PORT && y == EMPTY)
         return true;
     else
         return false;

@@ -21,6 +21,8 @@ public:
      */
     void AtlasInitByMapTxt(string path);
     void AtlasPrintColor(int top, int left, int bottom, int right);
+    void AtlasPrintMap();
+    
 };
 
 #endif

@@ -74,9 +74,31 @@ void Atlas::AtlasPrintColor(int top, int left, int bottom, int right) {
     for (int i = top; i <= bottom; i++) {
         for (int j = left; j <= right; j++) {
             if (color[i][j] == -1) {
-                printf("W ");
+                printf("W   ");
             } else {
-                printf("%d ", color[i][j]);
+                printf("%-4d", color[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+void Atlas::AtlasPrintMap() {
+    for (int i = 0; i < MapSize; i++) {
+        for (int j = 0; j < MapSize; j++) {
+            switch (atlas[i][j]) {
+            case EMPTY:
+                printf(". ");
+                break;
+            case WATER:
+                printf("* ");
+                break;
+            case WALL:
+                printf("# ");
+                break;
+            case PORT:
+                printf("A ");
+                break;
             }
         }
         printf("\n");
