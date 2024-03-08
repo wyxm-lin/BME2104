@@ -1,3 +1,4 @@
+#include "util.h"
 #include "ship.h"
 
 void Ship::update(ShipStatus sta, int targ) {

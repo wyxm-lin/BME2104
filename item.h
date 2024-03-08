@@ -10,6 +10,7 @@ public:
     Item(int fream, int x, int y, int val);
 
     Item() = default;
+    ~Item() = default;
 };
 
 #endif

@@ -7,13 +7,17 @@
 
 #include <iostream>
 #include <cstdio>
+#include <cstring>
+#include <string>
+#include <algorithm>
 #include <queue>
 #include <vector>
+#include <fstream>
 
 const int RobotNumber = 10; // the number of robot
 const int ShipNumber = 5; // the number of ship
 const int PortNumber = 10;
-const int MapSize = 200; // the size of map
+const int MapSize = 200; // the size of atlas
 const int FrameLimit = 15000; // the limit of the frames
 const int ExistFrame = 1000;
 const int dx[] = {0, 0, -1, 1};

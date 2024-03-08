@@ -1,7 +1,5 @@
-#include "map.h"
 #include "util.h"
-#include <string>
-#include <iostream>
+#include "controller.h"
 
 using std::string;
 using std::cin;
@@ -9,29 +7,29 @@ using std::cout;
 using std::endl;
 using std::pair;
 
-void Map::Init() {
+void Controller::Init() {
     for(int i = 0, robotid = -1; i < MapSize; i++) {
         string line;
         cin >> line;
         for(int j = 0; j < MapSize; j++) {
             switch (line[j]) {
             case '.':
-                map[i][j] = EMPTY;
+                atlas.atlas[i][j] = EMPTY;
                 break;
             case '*':
-                map[i][j] = WATER;
+                atlas.atlas[i][j] = WATER;
                 break;
             case '#':
-                map[i][j] = WALL;
+                atlas.atlas[i][j] = WALL;
                 break;
             case 'A':
-                map[i][j] = EMPTY;
+                atlas.atlas[i][j] = EMPTY;
                 ++robotid;
                 robot[robotid].id = robotid;
                 robot[robotid].update(i, j, false, true);
                 break;
             case 'B':
-                map[i][j] = PORT;
+                atlas.atlas[i][j] = PORT;
                 break;
             default:
                 break;
@@ -39,7 +37,7 @@ void Map::Init() {
         }
     }
 
-    // map information finished
+    // atlas information finished
 
     for(int i = 0; i < PortNumber; i++) {
         int id, x, y, T, v;
@@ -52,10 +50,10 @@ void Map::Init() {
     }
 
     // port information finished
-    int capa; cin >> capa;
+    int cap; cin >> cap;
     for(int i = 0; i < ShipNumber; i++) {
         ship[i].id = i;
-        ship[i].capacity = capa;
+        ship[i].capacity = cap;
     }
 
     string OKstring;
@@ -65,7 +63,7 @@ void Map::Init() {
     // endl would automatically fflush the std output
 }
 
-void Map::RunByFrame() {
+void Controller::RunByFrame() {
     int frameID = 0, nowamoney = 0;
     while(frameID < FrameLimit) {
         cin >> frameID >> nowamoney;
@@ -101,7 +99,7 @@ void Map::RunByFrame() {
     }
 }
 
-void Map::ItemTimeOutDisappear(int frameID) {
+void Controller::ItemTimeOutDisappear(int frameID) {
     while(ItemList.size()) {
         Item it = ItemList.front();
         if(it.BirthFrame + ExistFrame <= frameID) {
@@ -114,37 +112,6 @@ void Map::ItemTimeOutDisappear(int frameID) {
     }
 }
 
-void Map::ColorMap() {
-    // WALL is invalid, other status is valid
-    for (int i = 0; i < MapSize; i++) {
-        for (int j = 0; j < MapSize; j++) {
-            if (map[i][j] == WALL)
-                Color[i][j] = -1;
-            else 
-                Color[i][j] = 0;
-        }
-    }
-    // Color the map
-    ColorCount = 0;
-    for (int i = 0; i < MapSize; i++) {
-        for (int j = 0; j < MapSize; j++) {
-            if (Color[i][j] == 0) {
-                ColorCount++;
-                queue<pair<int, int>> q;
-                q.push({i, j});
-                Color[i][j] = ColorCount;
-                while (q.size()) {
-                    pair<int, int> now = q.front();
-                    q.pop();
-                    for (int k = 0; k < 4; k++) {
-                        int x = now.first + dx[k], y = now.second + dy[k];
-                        if (in(x, y) && Color[x][y] == 0 && reachable(map[now.first][now.second], map[x][y])) {
-                            Color[x][y] = ColorCount;
-                            q.push({x, y});
-                        }
-                    }
-                }
-            }
-        }
-    }
+void Controller::PreProcess() {
+
 }

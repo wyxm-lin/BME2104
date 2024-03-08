@@ -8,6 +8,9 @@ public:
     int id, capacity, target;
     ShipStatus status;
 
+    Ship() = default;
+    ~Ship() = default;
+
     /**
      * @brief Update ship info
     */

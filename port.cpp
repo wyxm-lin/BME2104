@@ -1,9 +1,11 @@
+#include "util.h"
 #include "port.h"
-#include "map.h"
+#include "atlas.h"
 
+using std::queue;
 using std::pair;
 
-void Port::PortDisInit(Map* ctlr) {
+void Port::PortDisInit(Atlas* atlas) {
     // initialize the distance is invalid
     for (int i = 0; i < MapSize; i++) {
         for (int j = 0; j < MapSize; j++) {
@@ -19,7 +21,7 @@ void Port::PortDisInit(Map* ctlr) {
         q.pop();
         for (int k = 0; k < 4; k++) {
             int nx = x_ + dx[k], ny = y_ + dy[k];
-            if (in(nx, ny) && dis[nx][ny] == -1 && ctlr->Color[nx][ny] == ctlr->Color[x][y]) {
+            if (in(nx, ny) && dis[nx][ny] == -1 && atlas->color[nx][ny] == atlas->color[x][y]) {
                 dis[nx][ny] = dis[x_][y_] + 1;
                 q.push({nx, ny});
             }
@@ -27,6 +29,6 @@ void Port::PortDisInit(Map* ctlr) {
     }
 }
 
-void Port::PrintDis() {
-    // TODO PrintDis function hasn't been implemented
+void Port::PrintDis(int x_, int y_) {
+    printf("The distance from Port(%d, %d) to (%d, %d) is %d\n", x, y, x_, y_, dis[x_][y_]);
 }

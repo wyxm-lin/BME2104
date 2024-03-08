@@ -12,6 +12,9 @@ public:
     bool IsCarry, IsAvailable, IsWorking;
     vector <int> path;
 
+    Robot() = default;
+    ~Robot() = default;
+
     /**
     * @brief Update Robot info each frame
     */

@@ -1,44 +1,48 @@
+#include "util.h"
 #include "searchPath.h"
+#include "robot.h"
+#include "atlas.h"
 
+using std::priority_queue;
 
-void SearchPath(Map $BME2104) {
-    astar($BME2104);
+void SearchPath(Robot (&robot)[RobotNumber], Atlas& atlas) {
+    astar(robot, atlas);
 }
 
-void astar(Map &BME2104) {
-    for(int robotId = 0; robotId < RobotNumber; robotId++){
-        if(!BME2104.robot[robotId].IsWorking){
+void astar(Robot (&robot)[RobotNumber], Atlas& atlas) {
+    for (int robotId = 0; robotId < RobotNumber; robotId++) {
+        if (!robot[robotId].IsWorking) {
             continue;
         }
-        std::priority_queue <Node> openList;
+        priority_queue <Node> openList;
         vector <Node> closeList;
-        int startX = BME2104.robot[robotId].nowx, startY = BME2104.robot[robotId].nowy;
-        int targetX = BME2104.robot[robotId].targetX, targetY = BME2104.robot[robotId].targetY;
+        int startX = robot[robotId].nowx, startY = robot[robotId].nowy;
+        int targetX = robot[robotId].targetX, targetY = robot[robotId].targetY;
         Node start = Node(startX, startY, 0, abs(startX - targetX) + abs(startY - targetY), -1);
-        
+
         openList.push(start);
-        while(!openList.empty()){
+        while (!openList.empty()) {
             Node now = openList.top();
             openList.pop();
             int x = now.x, y = now.y;
             closeList.push_back(now);
             now.isVisited = true;
-            if(x == targetX && y == targetY){
+            if (x == targetX && y == targetY) {
                 break;
             }
-            for(int i = 0; i < 4; i++){
+            for (int i = 0; i < 4; i++) {
                 int nextX = x + dx[i], nextY = y + dy[i];
-                if(nextX < 0 || nextX >= 200 || nextY < 0 || nextY >= 200){ // out of range
-                    continue;
+                if (in(nextX, nextY) == false) { // out of range
+                        continue;
                 }
-                if(BME2104.map[nextX][nextY] == WALL){  // wall
+                if (atlas.atlas[nextX][nextY] == WALL) {  // wall
                     continue;
                 }
                 Node use4Search = Node(nextX, nextY, now.g + 1, abs(nextX - targetX) + abs(nextY - targetY), i);   // only x and y are used here
-                if(find(closeList.begin(), closeList.end(), use4Search) != closeList.end()){  // in closeList
+                if (find(closeList.begin(), closeList.end(), use4Search) != closeList.end()) {  // in closeList
                     continue;
                 }
-                if(now.isVisited){
+                if (now.isVisited) {
                     continue;
                 }
                 now.isVisited = true;
@@ -61,6 +65,6 @@ void astar(Map &BME2104) {
             }
         }
         reverse(path.begin(), path.end());
-        BME2104.robot[robotId].path = path;
+        robot[robotId].path = path;
     }
 }

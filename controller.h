@@ -1,30 +1,36 @@
-#ifndef _MAP_H_
-#define _MAP_H_
+#ifndef _CONTROLLER_H_
+#define _CONTROLLER_H_
 
 #include "common.h"
-#include "util.h"
-#include "robot.h"
 #include "item.h"
+#include "robot.h"
 #include "port.h"
 #include "ship.h"
+#include "atlas.h"
 
 using std::queue;
 
-class Map {
+class Controller {
 public:
-    MapStatus map[MapSize][MapSize];
-    int ItemValue[MapSize][MapSize];
-    queue <Item> ItemList;
     Robot robot[RobotNumber];
     Port port[PortNumber];
     Ship ship[ShipNumber];
-    int Color[MapSize][MapSize];
-    int ColorCount;
+    Atlas atlas;
+    queue<Item> ItemList;
+    int ItemValue[MapSize][MapSize];
+
+    Controller() = default;
+    ~Controller() = default;
 
     /**
-    * @brief Initize the map, stage preprocess
+    * @brief Initize the controller
     */
     void Init();
+
+    /**
+     * @brief stage preprocess
+    */
+    void PreProcess(); // TODO First, port need to call Port.DisInit()
 
     /**
      * @brief pop time-out-items from ItemList queue
@@ -36,10 +42,6 @@ public:
     */
     void RunByFrame();
 
-    /**
-     * @brief Color the map
-    */
-    void ColorMap();
 
 };
 
