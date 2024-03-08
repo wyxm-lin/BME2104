@@ -35,7 +35,8 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
         if(robot[i].UnableTakeOrder()) continue;
         sort(ords[i].begin(), ords[i].end());
         for(auto ord: ords[i]) {
-            int px = ord.it.x, py = ord.it.y;
+            int px = ord.it.x;
+            int py = ord.it.y;
             if(ItemMap[px][py].isbooked()) continue;
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);

@@ -2,12 +2,15 @@
 #define _ORDER_H
 
 #include "common.h"
+#include "item.h"
 
 
 class Robot;
 class Port;
 class Item;
 class Altas;
+
+using std::queue;
 
 struct Order {
     Item it;
