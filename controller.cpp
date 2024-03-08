@@ -131,5 +131,7 @@ void Controller::ItemTimeOutDisappear(int frameID) {
 }
 
 void Controller::PreProcess() {
-
+    for(int i = 0; i < PortNumber; i++){
+        port[i].PortDisInit(&atlas);
+    }
 }
