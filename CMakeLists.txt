@@ -21,7 +21,12 @@ add_executable(main ${PROJECT_SOURCE_DIR}/main.cpp)
 target_link_libraries(main CodeCraft)
 set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 
+# 测试程序
 add_executable(test-port_dis_init ${PROJECT_SOURCE_DIR}/test/test-port_dis_init.cpp)
 target_link_libraries(test-port_dis_init CodeCraft)
 set_target_properties(test-port_dis_init PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
+add_executable(test-astar ${PROJECT_SOURCE_DIR}/test/test-astar.cpp)
+target_link_libraries(test-astar CodeCraft)
+set_target_properties(test-astar PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
