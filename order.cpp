@@ -23,7 +23,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             if(it.value < robot[i].ValueLimit) continue;
             Order ord;
             ord.DisItemToPort = port[aimport].GetDis(it.x, it.y);
-            //ord.DisRobotToItem =  TODO
+            // ord.DisRobotToItem = // TODO
             ord.PortId = aimport;
             ord.RobotId = i;
             ord.val = (double)it.value / (ord.DisItemToPort + ord.DisRobotToItem);

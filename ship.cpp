@@ -4,3 +4,7 @@
 void Ship::update(ShipStatus sta, int targ) {
     status = sta, target = targ;
 }
+
+void Ship::Print() {
+    
+}

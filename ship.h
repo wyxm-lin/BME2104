@@ -15,6 +15,8 @@ public:
      * @brief Update ship info
     */
     void update(ShipStatus sta, int targ);
+
+    void Print(); // TODO
 };
 
 #endif

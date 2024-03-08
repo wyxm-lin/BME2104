@@ -34,3 +34,6 @@ add_executable(test-one_robot ${PROJECT_SOURCE_DIR}/test/test-one_robot.cpp)
 target_link_libraries(test-one_robot CodeCraft)
 set_target_properties(test-one_robot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
+add_executable(test-just_move ${PROJECT_SOURCE_DIR}/test/test-just_move.cpp)
+target_link_libraries(test-just_move CodeCraft)
+set_target_properties(test-just_move PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)

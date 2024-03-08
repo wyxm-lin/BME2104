@@ -12,11 +12,11 @@ public:
     int id, nowx, nowy;
     int targetX, targetY;
     bool IsCarry, IsAvailable, IsWorking;
-    bool IsPathGenerated;
 
     int ValueLimit; // when value >= ValueLimit, this robot work
     vector <pair<int, int> > path;
     int pathIndex;
+    bool IsPathGenerated;
 
     Robot() = default;
     ~Robot() = default;
@@ -29,6 +29,8 @@ public:
     bool UnableTakeOrder();
 
     void TakeOrder(Item it);
+
+    void Print();
 
     // Below are the functions that are not used in this project
     void RobotPrintPath();

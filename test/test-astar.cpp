@@ -1,3 +1,12 @@
+/*
+
+    How to run this file:
+    Step1: build
+    Step2: in the shell (directory: /BME2104/), run the following command:
+        ./bin/test-astar
+
+*/
+
 #include "robot.h"
 #include "atlas.h"
 #include "common.h"

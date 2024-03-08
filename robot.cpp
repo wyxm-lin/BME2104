@@ -2,6 +2,9 @@
 #include "robot.h"
 #include "searchPath.h"
 
+using std::cout;
+using std::endl;
+
 void Robot::update(int x, int y, bool carry, bool available) {
     nowx = x, nowy = y;
     IsCarry = carry, IsAvailable = available;
@@ -19,6 +22,32 @@ void Robot::TakeOrder(Item it) {
     IsPathGenerated = false;
 }
 
+void Robot::Print() {
+    if (IsWorking) { // TODO consider the situation that when the robot get the Item, how to change robot's all state variables
+        if (nowx == targetX && nowy == targetY) {
+            cout << "get " << id << '\n';
+            IsCarry = true;
+            IsWorking = false; // FIXME just for test
+        }
+        else {
+            if (path[pathIndex].first == nowx + 1) {
+                cout << "move " << id << " " << DOWN << "\n";
+            }
+            else if (path[pathIndex].first == nowx - 1) {
+                cout << "move " << id << " " << UP << "\n";
+            }
+            else if (path[pathIndex].second == nowy + 1) {
+                cout << "move " << id << " " << RIGHT << "\n";
+            }
+            else if (path[pathIndex].second == nowy - 1) {
+                cout << "move " << id << " " << LEFT << "\n";
+            }
+            pathIndex++;
+        }
+    }
+}
+
+// below function is not used in this project
 void Robot::RobotPrintPath() {
     using std::cout;
     using std::endl;

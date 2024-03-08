@@ -66,25 +66,10 @@ void Controller::Init() {
     // endl would automatically fflush the std output
 }
 
-void Controller::ItemUpdateByFrame(int frameID) {
-    int NewItemCount;
-    cin >> NewItemCount;
-    for(int i = 1; i <= NewItemCount; i++) {
-        int x, y, val;
-        cin >> x >> y >> val;
-        int aimid = -1, nowadis = INF;
-        for(int j = 0; j < PortNumber; j++) {
-            int disj = port[j].GetDis(x, y);
-            if(disj == -1) continue; //unreachable
-            if(disj < nowadis) nowadis = disj , aimid = j;
-        }
-        if(aimid == -1) continue;
-        ItemList.emplace(Item(frameID, x, y, val, aimid));
-        ItemMap[x][y] = Item(frameID, x, y, val, aimid);
+void Controller::PreProcess() {
+    for(int i = 0; i < PortNumber; i++){
+        port[i].PortDisInit(&atlas);
     }
-    // Finish new item input
-    ItemTimeOutDisappear(frameID);
-    // Kick out disappeared items
 }
 
 void Controller::RunByFrame() {
@@ -113,41 +98,30 @@ void Controller::RunByFrame() {
 
         GenerateOrders(robot, ItemList, port, ItemMap);
 
-        for(int i = 0; i < RobotNumber; i++) {
-            if (robot[i].IsWorking == false)
-                continue;
-            if (robot[i].IsPathGenerated == false) {
-                robot[i].IsPathGenerated = true;
-                SearchPath(robot[i], atlas);
-                robot[i].pathIndex = 0; // initialize the pathIndex
-            }
-            printRobotMove(robot[i], i);
-        }
+        Schedule();
+        Print();
     }
 }
 
-void Controller::printRobotMove(Robot robot, int id) {
-    if (robot.pathIndex >= robot.path.size()) { // the robot has reached the target
-        if (robot.pathIndex == robot.path.size()) {
-            cout << "get " << id << endl;
+void Controller::ItemUpdateByFrame(int frameID) {
+    int NewItemCount;
+    cin >> NewItemCount;
+    for(int i = 1; i <= NewItemCount; i++) {
+        int x, y, val;
+        cin >> x >> y >> val;
+        int aimid = -1, nowadis = INF;
+        for(int j = 0; j < PortNumber; j++) {
+            int disj = port[j].GetDis(x, y);
+            if(disj == -1) continue; //unreachable
+            if(disj < nowadis) nowadis = disj , aimid = j;
         }
-        return;
+        if(aimid == -1) continue;
+        ItemList.emplace(Item(frameID, x, y, val, aimid));
+        ItemMap[x][y] = Item(frameID, x, y, val, aimid);
     }
-    pair<int, int> next = robot.path[robot.pathIndex];
-    cout << "move " << id << " ";
-    if (next.first == robot.nowx + 1) {
-        cout << "3" << endl;
-    }
-    else if (next.first == robot.nowx - 1) {
-        cout << "2" << endl;
-    }
-    else if (next.second == robot.nowy + 1) {
-        cout << "0" << endl;
-    }
-    else if (next.second == robot.nowy - 1) {
-        cout << "1" << endl;
-    }
-    robot.pathIndex ++;
+    // Finish new item input
+    ItemTimeOutDisappear(frameID);
+    // Kick out disappeared items
 }
 
 void Controller::ItemTimeOutDisappear(int frameID) {
@@ -163,8 +137,23 @@ void Controller::ItemTimeOutDisappear(int frameID) {
     }
 }
 
-void Controller::PreProcess() {
-    for(int i = 0; i < PortNumber; i++){
-        port[i].PortDisInit(&atlas);
+void Controller::Schedule() {
+    for (int i = 0; i < RobotNumber; i++) {
+        if (robot[i].IsWorking) {
+            if (robot[i].IsPathGenerated == false) {
+                SearchPath(robot[i], atlas);
+                robot[i].IsPathGenerated = true;
+            }
+        }
     }
+}
+
+void Controller::Print() {
+    for (int i = 0; i < RobotNumber; i ++) {
+        robot[i].Print();
+    }
+    for (int i = 0; i < ShipNumber; i ++) {
+        ship[i].Print();
+    }
+    cout << "OK\n"; // End of the frame
 }

@@ -31,12 +31,7 @@ public:
     /**
      * @brief stage preprocess
     */
-    void PreProcess(); // TODO First, port need to call Port.DisInit()
-
-    /**
-     * @brief pop time-out-items from ItemList queue
-    */
-    void ItemTimeOutDisappear(int frameID);
+    void PreProcess();
 
     /**
     * @brief Run the program frame by frame
@@ -49,10 +44,19 @@ public:
     void ItemUpdateByFrame(int frameID);
 
     /**
-     * @brief output a certain robot move by its path
-     * @param robot the robot to be printed
-     */
-    void printRobotMove(Robot robot, int id);
+     * @brief pop time-out-items from ItemList queue
+    */
+    void ItemTimeOutDisappear(int frameID);
+
+    /**
+     * @brief 
+    */
+    void Schedule();
+
+    /**
+     * @brief Print
+    */
+    void Print();
 };
 
 #endif

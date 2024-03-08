@@ -56,7 +56,8 @@ void astar(Robot &robot, Atlas& atlas) {
     }
 
     vector<pair<int, int> > path;
-    pair<int, int> elem = fa[targetX][targetY];
+    // pair<int, int> elem = fa[targetX][targetY];
+    pair<int, int> elem = {targetX, targetY}; // add the target point into path, so path = (Start, Target]
     while (elem != make_pair(startX, startY)) {
         path.push_back(elem);
         elem = fa[elem.first][elem.second];
