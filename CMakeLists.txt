@@ -41,3 +41,6 @@ set_target_properties(test-just_move PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJE
 add_executable(20240309score ${PROJECT_SOURCE_DIR}/release/20240309score.cpp)
 target_link_libraries(20240309score CodeCraft)
 set_target_properties(20240309score PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
+add_executable(test-astarwithcbs ${PROJECT_SOURCE_DIR}/test/test-astarwithcbs.cpp)
+set_target_properties(test-astarwithcbs PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
