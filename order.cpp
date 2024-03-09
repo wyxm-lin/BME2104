@@ -33,10 +33,10 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             }
             Order ord;
             ord.DisItemToPort = port[aimport].GetDis(it.x, it.y);
-            if(ord.DisItemToPort + frameID + CONSTDELTA >= it.BirthFrame + ExistFrame) {
+            // ord.DisRobotToItem =  // TODO
+            if(ord.DisRobotToItem + frameID + CONSTDELTA >= it.BirthFrame + ExistFrame) {
                 continue;
             }
-            // ord.DisRobotToItem =  // TODO
             ord.PortId = aimport;
             ord.RobotId = i;
             ord.val = (double)it.value / (ord.DisItemToPort + ord.DisRobotToItem);
