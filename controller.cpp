@@ -97,7 +97,7 @@ void Controller::RunByFrame() {
         cin >> OKstring;
         // Read 'OK'
         RobotActByFrame();
-        GenerateOrders(robot, ItemList, port, ItemMap, atlas);
+        GenerateOrders(robot, ItemList, port, ItemMap, atlas, frameID);
 
         // Schedule();
         // Print();

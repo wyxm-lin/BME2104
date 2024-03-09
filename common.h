@@ -23,6 +23,7 @@ const int ExistFrame = 1000;
 const int dx[] = {0, 0, -1, 1};
 const int dy[] = {1, -1, 0, 0};
 const int INF = 0x3f3f3f3f;
+const int CONSTDELTA = 50;
 
 enum MapStatus {
     EMPTY = 0, // empty areas
