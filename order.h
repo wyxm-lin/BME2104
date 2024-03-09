@@ -21,6 +21,8 @@ struct Order {
     bool operator<(const Order &a)const {
         return val < a.val;
     }
+
+    Order(): it(-1, -1, -1, -1, -1), RobotId(-1), PortId(-1), DisItemToPort(-1), DisRobotToItem(-1), val(0.0) {}
 };
 
 void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize]);

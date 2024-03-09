@@ -15,10 +15,10 @@ public:
 
     int ValueLimit; // when value >= ValueLimit, this robot work
     vector <pair<int, int> > path;
-    int pathIndex;
-    bool IsPathGenerated;
+    int pathIndex = 0;
+    bool IsPathGenerated = false; // NOTE Consideration of whether the variable is needed
 
-    Robot() = default;
+    Robot(): id(-1), nowx(-1), nowy(-1), targetX(-1), targetY(-1), IsCarry(false), IsAvailable(true), IsWorking(false), ValueLimit(0) {}
     ~Robot() = default;
 
     /**
@@ -32,8 +32,10 @@ public:
 
     void Print();
 
-    // Below are the functions that are not used in this project
+    /************Below variables and functions are for debug***************/
     void RobotPrintPath();
+    bool FinishFirstTakenOrder = false;
+    bool HasFirstTakenOrder = false;
 };
 
 #endif

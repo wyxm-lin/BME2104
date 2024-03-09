@@ -67,6 +67,7 @@ void Controller::Init() {
 }
 
 void Controller::PreProcess() {
+    atlas.ColorAtlas();
     for(int i = 0; i < PortNumber; i++){
         port[i].PortDisInit(&atlas);
     }
@@ -110,7 +111,7 @@ void Controller::ItemUpdateByFrame(int frameID) {
         int x, y, val;
         cin >> x >> y >> val;
         int aimid = -1, nowadis = INF;
-        for(int j = 0; j < PortNumber; j++) {
+        for(int j = 0; j < PortNumber; j++) { // search for the nearest port
             int disj = port[j].GetDis(x, y);
             if(disj == -1) continue; //unreachable
             if(disj < nowadis) nowadis = disj , aimid = j;
@@ -139,7 +140,8 @@ void Controller::ItemTimeOutDisappear(int frameID) {
 
 void Controller::Schedule() {
     for (int i = 0; i < RobotNumber; i++) {
-        if (robot[i].IsWorking) {
+        if (robot[i].IsWorking == true && robot[i].HasFirstTakenOrder == false) { // FIXME use a variable to debug
+            robot[i].HasFirstTakenOrder = true;
             if (robot[i].IsPathGenerated == false) {
                 SearchPath(robot[i], atlas);
                 robot[i].IsPathGenerated = true;

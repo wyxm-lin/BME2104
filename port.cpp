@@ -29,6 +29,7 @@ void Port::PortDisInit(Atlas* atlas) {
     }
 }
 
+/************Below variables and functions are for debug***************/
 void Port::PrintDis(int x_, int y_) {
     printf("The distance from Port(%d, %d) to (%d, %d) is %d\n", x, y, x_, y_, dis[x_][y_]);
 }

@@ -16,9 +16,7 @@ public:
     
     void ColorAtlas();
 
-    /**
-     * @brief below are the functions to test the correctness of the atlas
-     */
+    /************Below variables and functions are for debug***************/
     void AtlasInitByMapTxt(string path);
     void AtlasPrintColor(int top, int left, int bottom, int right);
     void AtlasPrintMap();

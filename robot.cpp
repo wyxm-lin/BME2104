@@ -24,11 +24,12 @@ void Robot::TakeOrder(Item it) {
 }
 
 void Robot::Print() {
-    if (IsWorking) { // TODO consider the situation that when the robot get the Item, how to change robot's all state variables
+    if (IsWorking && FinishFirstTakenOrder == false) { // TODO consider the situation that when the robot get the Item, how to change robot's all state variables
         if (nowx == targetX && nowy == targetY) {
             cout << "get " << id << '\n';
             IsCarry = true;
             IsWorking = false; // FIXME just for test
+            FinishFirstTakenOrder = true; // FIXME this varaible is for debug
         }
         else {
             if (path[pathIndex].first == nowx + 1) {
@@ -48,7 +49,7 @@ void Robot::Print() {
     }
 }
 
-// below function is not used in this project
+/************Below variables and functions are for debug***************/
 void Robot::RobotPrintPath() {
     using std::cout;
     using std::endl;

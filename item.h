@@ -1,6 +1,7 @@
 #ifndef _ITEM_H_
 #define _ITEM_H_
 
+#include "common.h"
 class Item {
 public:
     int BirthFrame, x, y, value;
@@ -17,6 +18,9 @@ public:
 
     Item() = default;
     ~Item() = default;
+
+    /************Below variables and functions are for debug***************/
+    void ItemPrintItSelf(std::fstream& out);
 };
 
 const Item EmptyItem = Item(0, 0, 0, 0, 0);

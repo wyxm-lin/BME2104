@@ -24,9 +24,7 @@ public:
         return dis[aimX][aimY];
     }
 
-    /**
-     * @brief below are the functions to test the correctness of the atlas
-    */
+    /************Below variables and functions are for debug***************/
     void PrintDis(int x_, int y_);
 
 };

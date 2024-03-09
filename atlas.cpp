@@ -39,6 +39,8 @@ void Atlas::ColorAtlas() {
     }
 }
 
+
+/************Below variables and functions are for debug***************/
 void Atlas::AtlasInitByMapTxt(string path) {
     using std::ifstream;
     ifstream fin(path);
