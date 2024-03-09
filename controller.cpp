@@ -102,6 +102,7 @@ void Controller::RunByFrame() {
         Schedule();
         // Print();
 
+        printf("OK\n");
         fflush(stdout);
     }
 }
