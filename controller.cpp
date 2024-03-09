@@ -99,7 +99,7 @@ void Controller::RunByFrame() {
         RobotActByFrame();
         GenerateOrders(robot, ItemList, port, ItemMap, atlas);
 
-        Schedule();
+        // Schedule();
         // Print();
 
         printf("OK\n");
@@ -165,6 +165,9 @@ void Controller::RobotActByFrame() {
             int aimport = robot[i].targetport;
             if(port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
                 robot[i].DropItem();
+            }
+            else {
+                robot[i].move();
             }
         }
         else {

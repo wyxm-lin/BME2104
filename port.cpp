@@ -34,7 +34,7 @@ int Port::GetDis(int aimX, int aimY) {
 }
 
 bool Port::arrive(int askx, int asky) {
-    if(x <= askx && x + 3 >= askx && asky <= y && y + 3 >= asky) {
+    if(x <= askx && askx <= x + 3 && y <= asky && asky <= y + 3) {
         return true;
     }
     return false;

@@ -19,8 +19,9 @@ bool Robot::UnableTakeOrder() {
 void Robot::TakeOrder(Item it) {
     targetX = it.x;
     targetY = it.y;
+    targetport = it.destination;
     IsWorking = true;
-    IsPathGenerated = false;
+    IsPathGenerated = false; // FIXME this variable is for debug
 }
 
 void Robot::move() {
