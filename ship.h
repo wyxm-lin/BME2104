@@ -16,7 +16,8 @@ public:
     */
     void update(ShipStatus sta, int targ);
 
-    void Print(); // TODO
+    void MoveToPort(int tar);
+    void Sell();
 };
 
 #endif

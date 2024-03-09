@@ -79,6 +79,21 @@ void Controller::RunByFrame() {
         cin >> frameID >> nowamoney;
         ItemUpdateByFrame(frameID);
 
+        //FIXME
+        if(frameID == 1) {
+            for(int i = 0; i < 5; i++) {
+                ship[i].MoveToPort(i);
+            }
+        }
+        
+        if(frameID == 13500) {
+            for(int i = 0; i < 5; i++) {
+                ship[i].Sell();
+            }
+        }
+
+        //FIXME
+
         for(int i = 0; i < RobotNumber; i++) {
             int carry, x, y, status;
             cin >> carry >> x >> y >> status;

@@ -11,7 +11,7 @@ class Port {
 public:
     int id, x, y, T, velocity;
     int dis[MapSize][MapSize];
-
+    bool openstatus = true;
     Port() = default;
     ~Port() = default;
 
@@ -22,7 +22,9 @@ public:
 
     int GetDis(int aimX, int aimY);
     bool arrive(int askx, int asky);
-    
+    bool isopen();
+    void open();
+    void close();
     /************Below variables and functions are for debug***************/
     void PrintDis(int x_, int y_);
 

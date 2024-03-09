@@ -40,6 +40,18 @@ bool Port::arrive(int askx, int asky) {
     return false;
 }
 
+bool Port::isopen() {
+    return openstatus;
+}
+
+void Port::open() {
+    openstatus = true;
+}
+
+void Port::close() {
+    openstatus = false;
+}
+
 /************Below variables and functions are for debug***************/
 void Port::PrintDis(int x_, int y_) {
     printf("The distance from Port(%d, %d) to (%d, %d) is %d\n", x, y, x_, y_, dis[x_][y_]);

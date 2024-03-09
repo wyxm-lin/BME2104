@@ -15,6 +15,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
     vector <Order> ords[RobotNumber]; 
     while (Q.size()) {
         Item it = Q.front(); Q.pop();
+        if(port[it.destination].isopen() == false) continue;
         if (it != ItemMap[it.x][it.y]) { // this item has been taken, just kick out
             continue; 
         }
