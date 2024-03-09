@@ -56,9 +56,9 @@ public:
     void Schedule();
 
     /**
-     * @brief Print the info - interacte with the grader
+     * @brief robot runs
     */
-    void Print();
+    void RobotActByFrame();
 };
 
 #endif

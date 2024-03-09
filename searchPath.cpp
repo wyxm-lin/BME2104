@@ -64,4 +64,5 @@ void astar(Robot &robot, Atlas& atlas) {
     }
     reverse(path.begin(), path.end());
     robot.path = path;
+    robot.pathIndex = 0;
 }

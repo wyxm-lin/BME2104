@@ -23,30 +23,63 @@ void Robot::TakeOrder(Item it) {
     IsPathGenerated = false;
 }
 
-void Robot::Print() {
-    if (IsWorking && FinishFirstTakenOrder == false) { // TODO consider the situation that when the robot get the Item, how to change robot's all state variables
-        if (nowx == targetX && nowy == targetY) {
-            cout << "get " << id << '\n';
-            IsCarry = true;
-            IsWorking = false; // FIXME just for test
-            FinishFirstTakenOrder = true; // FIXME this varaible is for debug
-        }
-        else {
-            if (path[pathIndex].first == nowx + 1) {
-                cout << "move " << id << " " << DOWN << "\n";
-            }
-            else if (path[pathIndex].first == nowx - 1) {
-                cout << "move " << id << " " << UP << "\n";
-            }
-            else if (path[pathIndex].second == nowy + 1) {
-                cout << "move " << id << " " << RIGHT << "\n";
-            }
-            else if (path[pathIndex].second == nowy - 1) {
-                cout << "move " << id << " " << LEFT << "\n";
-            }
-            pathIndex++;
-        }
+void Robot::move() {
+    if (path[pathIndex].first == nowx + 1) {
+        printf("move %d %d\n", id, DOWN);
     }
+    else if (path[pathIndex].first == nowx - 1) {
+        printf("move %d %d\n", id, UP);
+    }
+    else if (path[pathIndex].second == nowy + 1) {
+        printf("move %d %d\n", id, RIGHT);
+    }
+    else if (path[pathIndex].second == nowy - 1) {
+        printf("move %d %d\n", id, LEFT);
+    }
+    pathIndex++;
+}
+
+void Robot::Print() {
+    // if(IsWorking == false) return;
+    // if(nowx == targetX && nowy == targetY) {
+    //     TakeItem();
+    // }
+    // if (IsWorking && FinishFirstTakenOrder == false) { // TODO consider the situation that when the robot get the Item, how to change robot's all state variables
+    //     if (nowx == targetX && nowy == targetY) {
+    //         cout << "get " << id << '\n';
+    //         IsCarry = true;
+    //         IsWorking = false; // FIXME just for test
+    //         FinishFirstTakenOrder = true; // FIXME this varaible is for debug
+    //     }
+    //     else {
+    //         if (path[pathIndex].first == nowx + 1) {
+    //             cout << "move " << id << " " << DOWN << "\n";
+    //         }
+    //         else if (path[pathIndex].first == nowx - 1) {
+    //             cout << "move " << id << " " << UP << "\n";
+    //         }
+    //         else if (path[pathIndex].second == nowy + 1) {
+    //             cout << "move " << id << " " << RIGHT << "\n";
+    //         }
+    //         else if (path[pathIndex].second == nowy - 1) {
+    //             cout << "move " << id << " " << LEFT << "\n";
+    //         }
+    //         pathIndex++;
+    //     }
+    // }
+}
+
+void Robot::DropItem() {
+    IsWorking = false;
+    IsCarry = false;
+    printf("pull %d\n", id);
+}
+
+void Robot::TakeItem(int NewX, int NewY) {
+    IsCarry = true;
+    targetX = NewX;
+    targetY = NewY;
+    printf("get %d\n", id);
 }
 
 /************Below variables and functions are for debug***************/

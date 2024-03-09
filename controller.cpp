@@ -96,11 +96,13 @@ void Controller::RunByFrame() {
         string OKstring;
         cin >> OKstring;
         // Read 'OK'
-
-        GenerateOrders(robot, ItemList, port, ItemMap);
+        RobotActByFrame();
+        GenerateOrders(robot, ItemList, port, ItemMap, atlas);
 
         Schedule();
-        Print();
+        // Print();
+
+        fflush(stdout);
     }
 }
 
@@ -150,12 +152,38 @@ void Controller::Schedule() {
     }
 }
 
-void Controller::Print() {
-    for (int i = 0; i < RobotNumber; i ++) {
-        robot[i].Print();
+void Controller::RobotActByFrame() {
+    for(int i = 0; i < RobotNumber; i++) {
+        if(robot[i].IsAvailable == false) {
+            continue;
+        }
+        if(robot[i].IsWorking == false) {
+            continue;
+        }
+        if(robot[i].IsCarry) {
+            int aimport = robot[i].targetport;
+            if(port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
+                robot[i].DropItem();
+            }
+        }
+        else {
+            if(robot[i].nowx == robot[i].targetX && robot[i].nowy == robot[i].targetY) {
+                ItemMap[robot[i].targetX][robot[i].targetY] = EmptyItem;
+                int aimport = robot[i].targetport;
+                robot[i].TakeItem(port[aimport].x, port[aimport].y);
+                SearchPath(robot[i], atlas);
+            }
+            robot[i].move();
+        }
     }
-    for (int i = 0; i < ShipNumber; i ++) {
-        ship[i].Print();
-    }
-    cout << "OK\n"; // End of the frame
 }
+
+// void Controller::Print() {
+//     for (int i = 0; i < RobotNumber; i ++) {
+//         robot[i].Print();
+//     }
+//     for (int i = 0; i < ShipNumber; i ++) {
+//         ship[i].Print();
+//     }
+//     cout << "OK\n"; // End of the frame
+// }

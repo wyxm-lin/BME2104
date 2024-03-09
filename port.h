@@ -20,10 +20,9 @@ public:
      */
     void PortDisInit(Atlas* atlas);
 
-    int GetDis(int aimX, int aimY) {
-        return dis[aimX][aimY];
-    }
-
+    int GetDis(int aimX, int aimY);
+    bool arrive(int askx, int asky);
+    
     /************Below variables and functions are for debug***************/
     void PrintDis(int x_, int y_);
 

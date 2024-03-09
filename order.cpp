@@ -11,7 +11,7 @@ using std::sort;
 /**
  * @brief go over all the items, calc the value of all orders, val = itemvalue / dis
 */
-void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize]) {
+void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize], Atlas &atlas) {
     vector <Order> ords[RobotNumber]; 
     while (Q.size()) {
         Item it = Q.front(); Q.pop();
@@ -55,6 +55,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             }
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
+            SearchPath(robot[i], atlas);
             break;
         }
     }

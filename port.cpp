@@ -29,6 +29,17 @@ void Port::PortDisInit(Atlas* atlas) {
     }
 }
 
+int Port::GetDis(int aimX, int aimY) {
+    return dis[aimX][aimY];
+}
+
+bool Port::arrive(int askx, int asky) {
+    if(x <= askx && x + 3 >= askx && asky <= y && y + 3 >= asky) {
+        return true;
+    }
+    return false;
+}
+
 /************Below variables and functions are for debug***************/
 void Port::PrintDis(int x_, int y_) {
     printf("The distance from Port(%d, %d) to (%d, %d) is %d\n", x, y, x_, y_, dis[x_][y_]);
