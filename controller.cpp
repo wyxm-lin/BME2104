@@ -111,6 +111,8 @@ void Controller::RunByFrame() {
         string OKstring;
         cin >> OKstring;
         // Read 'OK'
+
+        avoidCollison(robot, atlas);
         RobotActByFrame();
         GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
 
@@ -195,7 +197,8 @@ void Controller::RobotActByFrame() {
                 int aimport = robot[i].targetport;
                 robot[i].TakeItem(port[aimport].x, port[aimport].y);
                 // SearchPath(robot[i], atlas);
-                AstarTest(robot, atlas, 1.0, NowFrame); // FIXME
+                // AstarTest(robot, atlas, 1.0, NowFrame); // FIXME
+                AstarTimeEpsilon(robot[i], atlas, 1.0);
             }
             robot[i].move();
         }

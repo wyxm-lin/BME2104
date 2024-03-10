@@ -29,6 +29,14 @@ void Robot::TakeOrder(Item it) {
 void Robot::move() {
     if (pathIndex == -1)
         return;
+
+    // Stop
+    if(pathWithTime[pathIndex].x == nowx && pathWithTime[pathIndex].y == nowy){
+        pathIndex++;
+        return;
+    }
+    
+    //Move
     if (pathWithTime[pathIndex].x == nowx + 1) {
         printf("move %d %d\n", id, DOWN);
     }

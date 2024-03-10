@@ -2,6 +2,8 @@
 #define _SEARCHPATH_H_
 
 #include "common.h"
+#include <bitset>
+using std::bitset;
 
 class Atlas;
 class Robot;

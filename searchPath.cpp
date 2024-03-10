@@ -2,7 +2,6 @@
 #include "searchPath.h"
 #include "robot.h"
 #include "atlas.h"
-#include <bitset>
 
 using std::priority_queue;
 using std::pair;
@@ -10,7 +9,7 @@ using std::make_pair;
 using std::unordered_set;
 using std::fstream;
 using std::unordered_map;
-using std::bitset;
+
 
 void SearchPath(Robot &robot, Atlas& atlas) {
     astar(robot, atlas);

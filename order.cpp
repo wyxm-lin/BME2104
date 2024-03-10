@@ -35,7 +35,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             Order ord;
             ord.DisItemToPort = port[aimport].GetDis(it.x, it.y);
             // ord.DisRobotToItem =  // TODO
-            if(ord.DisRobotToItem + NowFrame + CONSTDELTA >= it.BirthFrame + ExistFrame) {
+            if(ord.DisRobotToItem + NowFrame + CONSTDELTA >= it.BirthFrame + ExistFrame) {  // FIXME: CONSTDELTA
                 continue;
             }
             ord.PortId = aimport;
@@ -59,8 +59,9 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             }
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
-            AstarTest(robot, atlas, 1.0, NowFrame);
+            // AstarTest(robot, atlas, 1.0, NowFrame);
             // SearchPath(robot[i], atlas);
+            AstarTimeEpsilon(robot[i], atlas, 1.0);
             break;
         }
     }
