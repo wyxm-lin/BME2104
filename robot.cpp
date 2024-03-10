@@ -26,16 +26,14 @@ void Robot::TakeOrder(Item it) {
 }
 
 void Robot::move() {
-    if (pathIndex == -2) // no path to move (this variable is for debug when search path)
+    if (pathIndex == -1) // no path to move (this variable is for debug when search path)
         return;
-
     // Stop
-    ++ pathIndex;
-    if(pathWithTime[pathIndex].x == nowx && pathWithTime[pathIndex].y == nowy){
+    if (pathWithTime[pathIndex].x == nowx && pathWithTime[pathIndex].y == nowy) {
+        ++ pathIndex;
         return;
     }
-    //Move
-    if (pathWithTime[pathIndex].x == nowx + 1) {
+    else if (pathWithTime[pathIndex].x == nowx + 1) { //Move
         printf("move %d %d\n", id, DOWN);
     }
     else if (pathWithTime[pathIndex].x == nowx - 1) {
@@ -47,7 +45,8 @@ void Robot::move() {
     else if (pathWithTime[pathIndex].y == nowy - 1) {
         printf("move %d %d\n", id, LEFT);
     }
-    NodeWithTimeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position
+    // NodeWithTimeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position // NOTE: not used now in this project
+    ++ pathIndex;
 }
 
 void Robot::DropItem() {

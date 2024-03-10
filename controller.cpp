@@ -112,7 +112,7 @@ void Controller::RunByFrame() {
         cin >> OKstring;
         // Read 'OK'
 
-        // avoidCollison(robot, atlas);
+        avoidCollison(robot, atlas);
         RobotActByFrame();
         GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
 

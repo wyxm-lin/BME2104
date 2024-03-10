@@ -40,29 +40,32 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
 
     // add time
     bool modifyFlag = false;
-    for(int time = 0; time <= FrameLimit - robot[0].NowFrame; time++){
+    for(int time = 0; time <= FrameLimit - robot[0].NowFrame; time++){ // time is offset
         if(modifyFlag) {
             break;
         }
         for(int i1 = 0; i1 < RobotNumber; i1++) {
-            if(!robot[i1].IsWorking) {continue;}
+            if (!robot[i1].IsWorking) { // no working, no path
+                continue;
+            }
 
             // passThrough[robot[i1].pathWithTime[time].x][robot[i1].pathWithTime[time].y].reset(i1);
 
             // collision on area
             int p1 = robot[i1].pathIndex + time;
-            if(passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y].count() > 1) {
+            if (passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y].count() > 1) { // space conflict, time conflict maybe not exist
                 // robot path search index
                 
 
                 // timeNin is the time when the robot enter the area
                 // timeNout is the time when the robot leave the area but STILL IN the area
                 int time1in = p1, time1out = p1, time2in = 0, time2out = 0;
-                int i2 = passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y]._Find_next(i1);    // i1 is strictly less than i2
+                int i2 = passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y]._Find_next(i1);    // i1 is strictly less than i2 
+                // NOTE above line: if have more than one conflict, how to deal?
 
                 // find time1out
-                for(int timeCheck = p1; timeCheck <robot[i1].pathWithTime.size(); timeCheck++) {
-                    if(passThrough[robot[i1].pathWithTime[timeCheck].x][robot[i1].pathWithTime[timeCheck].y].test(i2)) {
+                for(int timeCheck = p1; timeCheck < robot[i1].pathWithTime.size(); timeCheck++) {
+                    if(passThrough[robot[i1].pathWithTime[timeCheck].x][robot[i1].pathWithTime[timeCheck].y].test(i2)) { // i1 and i2 have conflict (x, y, Time)
                         continue;
                     } else {
                         time1out = timeCheck - 1;   // make sure the robot is still in the area
@@ -71,7 +74,7 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
                 }
                 
                 // check time dimension to see if i1 & i2 collide in time
-                int p2 = robot[i1].pathIndex + time;
+                int p2 = robot[i2].pathIndex + time;
                 for(int timeCheck = p2; timeCheck < robot[i2].pathWithTime.size(); timeCheck++) {
                     if(time2in == 0 && passThrough[robot[i2].pathWithTime[timeCheck].x][robot[i2].pathWithTime[timeCheck].y].test(i1)) {
                         // first get in the area
@@ -99,11 +102,11 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
                 vector<NodeWithTime> pathModify;
                 int StopTime = time1out - time2in + 1;
                 for(int timeCheck = 0; timeCheck < robot[i2].pathWithTime.size() + StopTime; timeCheck++) {
-                    if(timeCheck < time2in) {
+                    if(timeCheck < time2in) { // head
                         pathModify.push_back(robot[i2].pathWithTime[timeCheck]);
-                    } else if(timeCheck >= time2in && timeCheck < time2in + StopTime) {
-                        pathModify.push_back(robot[i2].pathWithTime[timeCheck - 1]);
-                    } else {
+                    } else if(timeCheck >= time2in && timeCheck < time2in + StopTime) { // mid 
+                        pathModify.push_back(robot[i2].pathWithTime[time2in - 1]); // stop at the same position
+                    } else { // tail
                         pathModify.push_back(robot[i2].pathWithTime[timeCheck - StopTime]);
                     }
                 }
@@ -171,6 +174,6 @@ void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
     }
     reverse(pathWithTime.begin(), pathWithTime.end());
     robot.pathWithTime = pathWithTime;
-    robot.pathIndex = -1; // add this line NOTE: set the pathIndex to -1
+    robot.pathIndex = 0; // add this line NOTE: set pathIndex to 0
     robot.NodeWithTimeSet.insert(pathWithTime.begin(), pathWithTime.end());
 }
