@@ -27,7 +27,7 @@ void Controller::Init() {
                 atlas.atlas[i][j] = EMPTY;
                 ++robotid;
                 robot[robotid].id = robotid;
-                robot[robotid].update(i, j, false, true);
+                robot[robotid].update(i, j, false, true, 0);
                 break;
             case 'B':
                 atlas.atlas[i][j] = PORT;
@@ -74,19 +74,19 @@ void Controller::PreProcess() {
 }
 
 void Controller::RunByFrame() {
-    int frameID = 0, nowamoney = 0;
-    while(frameID < FrameLimit) {
-        cin >> frameID >> nowamoney;
-        ItemUpdateByFrame(frameID);
+    int nowamoney = 0;
+    while(NowFrame < FrameLimit) {
+        cin >> NowFrame >> nowamoney;
+        ItemUpdateByFrame(NowFrame);
 
         //FIXME
-        if(frameID == 1) {
+        if(NowFrame == 1) {
             for(int i = 0; i < 5; i++) {
                 ship[i].MoveToPort(i);
             }
         }
         
-        if(frameID == 13500) {
+        if(NowFrame == 13500) {
             for(int i = 0; i < 5; i++) {
                 ship[i].Sell();
             }
@@ -97,7 +97,7 @@ void Controller::RunByFrame() {
         for(int i = 0; i < RobotNumber; i++) {
             int carry, x, y, status;
             cin >> carry >> x >> y >> status;
-            robot[i].update(x, y, carry, status);
+            robot[i].update(x, y, carry, status, NowFrame);
         }
         // Robots Data Update
 
@@ -112,7 +112,7 @@ void Controller::RunByFrame() {
         cin >> OKstring;
         // Read 'OK'
         RobotActByFrame();
-        GenerateOrders(robot, ItemList, port, ItemMap, atlas, frameID);
+        GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
 
         // Schedule();
         // Print();
@@ -190,19 +190,10 @@ void Controller::RobotActByFrame() {
                 ItemMap[robot[i].targetX][robot[i].targetY] = EmptyItem;
                 int aimport = robot[i].targetport;
                 robot[i].TakeItem(port[aimport].x, port[aimport].y);
-                SearchPath(robot[i], atlas);
+                // SearchPath(robot[i], atlas);
+                AstarTest(robot, atlas, 1.0, NowFrame); // FIXME
             }
             robot[i].move();
         }
     }
 }
-
-// void Controller::Print() {
-//     for (int i = 0; i < RobotNumber; i ++) {
-//         robot[i].Print();
-//     }
-//     for (int i = 0; i < ShipNumber; i ++) {
-//         ship[i].Print();
-//     }
-//     cout << "OK\n"; // End of the frame
-// }

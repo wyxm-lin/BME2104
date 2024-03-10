@@ -44,3 +44,11 @@ set_target_properties(20240309score PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJEC
 
 add_executable(test-astarwithcbs ${PROJECT_SOURCE_DIR}/test/test-astarwithcbs.cpp)
 set_target_properties(test-astarwithcbs PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
+add_executable(test-two_robot ${PROJECT_SOURCE_DIR}/test/test-two_robot.cpp)
+target_link_libraries(test-two_robot CodeCraft)
+set_target_properties(test-two_robot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
+add_executable(test-ten_robot ${PROJECT_SOURCE_DIR}/test/test-ten_robot.cpp)
+target_link_libraries(test-ten_robot CodeCraft)
+set_target_properties(test-ten_robot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)

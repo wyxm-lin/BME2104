@@ -6,6 +6,9 @@
 using std::priority_queue;
 using std::pair;
 using std::make_pair;
+using std::unordered_set;
+using std::fstream;
+using std::unordered_map;
 
 void SearchPath(Robot &robot, Atlas& atlas) {
     astar(robot, atlas);
@@ -119,4 +122,87 @@ void astarEpsilon(Robot &robot, Atlas& atlas, double epsilon) {
     }
     reverse(path.begin(), path.end());
     robot.path = path;
+    robot.pathIndex = 0;
+}
+
+void AstarTest(Robot (&robots)[RobotNumber], Atlas &atlas, double epsilon, int NowFrame) {
+    for (int id = 0; id < RobotNumber; id ++) {
+        if (!robots[id].IsWorking) {
+            continue;
+        }
+
+        unordered_map<NodeWithTime, NodeWithTime> fa;
+        bool GridVisited[200][200]; // use for two dimension search
+        memset(GridVisited, false, sizeof(GridVisited));
+
+        priority_queue <NodeWithTime> openList;
+        int startX = robots[id].nowx, startY = robots[id].nowy;
+        int targetX = robots[id].targetX, targetY = robots[id].targetY;
+
+        NodeWithTime start = NodeWithTime(startX, startY, NowFrame, 0, epsilon * (abs(startX - targetX) + abs(startY - targetY)));
+        openList.push(start);
+        fa[start] = start;
+        NodeWithTime Last;
+
+        while (!openList.empty()) {
+            NodeWithTime now = openList.top();
+            openList.pop();
+            Last = now;
+            int x = now.x, y = now.y, Time = now.Time;
+            if (x == targetX && y == targetY) {
+                break;
+            }
+
+            for (int i = 0; i < 4; i++) {
+                int nextX = x + dx[i], nextY = y + dy[i], NextTime = Time + 1;
+                if (valid(nextX, nextY) == false) {
+                    continue;
+                }
+                if (reachable(atlas.atlas[nextX][nextY], atlas.atlas[x][y]) == false) {
+                    continue;
+                }
+                if (GridVisited[nextX][nextY]) { // GridVisited
+                    continue;
+                }
+                
+                NodeWithTime use4Search = NodeWithTime(nextX, nextY, NextTime, now.g + 1, epsilon * (abs(nextX - targetX) + abs(nextY - targetY) + abs(NextTime - NowFrame)));
+                NodeWithTime NextPosNowTime = NodeWithTime(nextX, nextY, Time, 0, 0);
+                NodeWithTime NowPosNextTime = NodeWithTime(x, y, NextTime, 0, 0);
+                bool flag = true;
+                for (int pre = 0; pre < id; pre ++) {
+                    unordered_set<NodeWithTime>& it = robots[pre].pathWithTimeSet;
+                    if (it.find(use4Search) != it.end() || // vertex conflict
+                        it.find(NextPosNowTime) != it.end() && it.find(NowPosNextTime) != it.end()) { // edge conflict
+                        flag = false;
+                        break;
+                    }
+
+                }
+                if (flag == false) {
+                    // FIXME go back
+                    continue;
+                }
+                fa[use4Search] = now;
+                GridVisited[nextX][nextY] = true; // two dimension search
+                openList.push(use4Search);
+            }
+        }
+
+        if (Last.x == targetX && Last.y == targetY) {
+            vector<pair<int, int> > path;
+            while (Last != start) {
+                path.push_back({Last.x, Last.y});
+                robots[id].pathWithTimeSet.insert(Last);
+                Last = fa[Last];
+            }
+            reverse(path.begin(), path.end());
+            robots[id].path = path;
+            robots[id].pathIndex = 0;
+        }
+        else {
+            // TODO 没有找到路径
+            robots[id].path = vector<pair<int, int> >();
+            robots[id].pathIndex = -1;
+        }
+    }
 }

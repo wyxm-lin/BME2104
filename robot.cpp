@@ -4,10 +4,12 @@
 
 using std::cout;
 using std::endl;
+using std::bitset;
 
-void Robot::update(int x, int y, bool carry, bool available) {
+void Robot::update(int x, int y, bool carry, bool available, int frameID) {
     nowx = x, nowy = y;
     IsCarry = carry, IsAvailable = available;
+    NowFrame = frameID;
 }
 
 bool Robot::UnableTakeOrder() {
@@ -25,6 +27,8 @@ void Robot::TakeOrder(Item it) {
 }
 
 void Robot::move() {
+    if (pathIndex == -1)
+        return;
     if (path[pathIndex].first == nowx + 1) {
         printf("move %d %d\n", id, DOWN);
     }
@@ -37,37 +41,8 @@ void Robot::move() {
     else if (path[pathIndex].second == nowy - 1) {
         printf("move %d %d\n", id, LEFT);
     }
+    pathWithTimeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position
     pathIndex++;
-}
-
-void Robot::Print() {
-    // if(IsWorking == false) return;
-    // if(nowx == targetX && nowy == targetY) {
-    //     TakeItem();
-    // }
-    // if (IsWorking && FinishFirstTakenOrder == false) { // TODO consider the situation that when the robot get the Item, how to change robot's all state variables
-    //     if (nowx == targetX && nowy == targetY) {
-    //         cout << "get " << id << '\n';
-    //         IsCarry = true;
-    //         IsWorking = false; // FIXME just for test
-    //         FinishFirstTakenOrder = true; // FIXME this varaible is for debug
-    //     }
-    //     else {
-    //         if (path[pathIndex].first == nowx + 1) {
-    //             cout << "move " << id << " " << DOWN << "\n";
-    //         }
-    //         else if (path[pathIndex].first == nowx - 1) {
-    //             cout << "move " << id << " " << UP << "\n";
-    //         }
-    //         else if (path[pathIndex].second == nowy + 1) {
-    //             cout << "move " << id << " " << RIGHT << "\n";
-    //         }
-    //         else if (path[pathIndex].second == nowy - 1) {
-    //             cout << "move " << id << " " << LEFT << "\n";
-    //         }
-    //         pathIndex++;
-    //     }
-    // }
 }
 
 void Robot::DropItem() {

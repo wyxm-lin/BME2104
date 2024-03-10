@@ -13,6 +13,9 @@
 #include <queue>
 #include <vector>
 #include <fstream>
+#include <unordered_set>
+#include <bitset>
+#include <unordered_map>
 
 const int RobotNumber = 10; // the number of robot
 const int ShipNumber = 5; // the number of ship
@@ -24,6 +27,7 @@ const int dx[] = {0, 0, -1, 1};
 const int dy[] = {1, -1, 0, 0};
 const int INF = 0x3f3f3f3f;
 const int CONSTDELTA = 500; // FIXME
+const int TotalFrame = 15000;
 
 enum MapStatus {
     EMPTY = 0, // empty areas
