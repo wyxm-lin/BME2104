@@ -30,7 +30,6 @@ int main() {
         BME2104.port[i].close();
     }
     
-    BME2104.PreProcess();
     BME2104.RunByFrame();
     return 0;
 }

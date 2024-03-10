@@ -266,6 +266,7 @@ void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
                 continue;
             }
             NodeWithTime use4Search = NodeWithTime(nextX, nextY, NextTime, now.g + 1, epsilon * (abs(nextX - targetX) + abs(nextY - targetY) + abs(NextTime - NowFrame)));
+            vis[nextX][nextY] = true; // add this line 
             fa[use4Search] = now;
             openList.push(use4Search);
         }
@@ -278,6 +279,7 @@ void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
     }
     reverse(pathWithTime.begin(), pathWithTime.end());
     robot.pathWithTime = pathWithTime;
+    robot.pathIndex = 0; // add this line
     robot.NodeWithTimeSet.insert(pathWithTime.begin(), pathWithTime.end());
 }
 
