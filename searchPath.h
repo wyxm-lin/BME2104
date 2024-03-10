@@ -50,11 +50,12 @@ namespace std {
     template <>
     struct hash<NodeWithTime> {
         size_t operator()(const NodeWithTime &node) const {
-            return node.x + node.y * 200 + node.Time * 40000;
+            return node.x + node.y * 200 + node.Time * 40000; // NOTE: efficient hash
         }
     };
 }
-void AstarTest(Robot (&robots)[RobotNumber], Atlas &atlas, double epsilon, int NowFrame);
 
+void AstarTest(Robot (&robots)[RobotNumber], Atlas &atlas, double epsilon, int NowFrame);
+void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon);
 
 #endif

@@ -41,7 +41,7 @@ void Robot::move() {
     else if (path[pathIndex].second == nowy - 1) {
         printf("move %d %d\n", id, LEFT);
     }
-    pathWithTimeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position
+    NodeWithTimeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position
     pathIndex++;
 }
 

@@ -21,7 +21,8 @@ public:
     bool IsPathGenerated = false; // NOTE Consideration of whether the variable is needed
 
     int NowFrame = 0;
-    unordered_set<NodeWithTime> pathWithTimeSet;
+    unordered_set<NodeWithTime> NodeWithTimeSet;
+    vector<NodeWithTime> pathWithTime;
 
     Robot(): id(-1), nowx(-1), nowy(-1), targetX(-1), targetY(-1), IsCarry(false), IsAvailable(true), IsWorking(false), ValueLimit(0), targetport(-1) {}
     ~Robot() = default;
