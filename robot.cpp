@@ -29,16 +29,16 @@ void Robot::TakeOrder(Item it) {
 void Robot::move() {
     if (pathIndex == -1)
         return;
-    if (path[pathIndex].x == nowx + 1) {
+    if (pathWithTime[pathIndex].x == nowx + 1) {
         printf("move %d %d\n", id, DOWN);
     }
-    else if (path[pathIndex].x == nowx - 1) {
+    else if (pathWithTime[pathIndex].x == nowx - 1) {
         printf("move %d %d\n", id, UP);
     }
-    else if (path[pathIndex].y == nowy + 1) {
+    else if (pathWithTime[pathIndex].y == nowy + 1) {
         printf("move %d %d\n", id, RIGHT);
     }
-    else if (path[pathIndex].y == nowy - 1) {
+    else if (pathWithTime[pathIndex].y == nowy - 1) {
         printf("move %d %d\n", id, LEFT);
     }
     NodeWithTimeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position
@@ -62,10 +62,10 @@ void Robot::TakeItem(int NewX, int NewY) {
 void Robot::RobotPrintPath() {
     using std::cout;
     using std::endl;
-    cout << "path.size is " << path.size() << endl;
+    cout << "path.size is " << pathWithTime.size() << endl;
     cout << "the start point is (" << nowx << ", " << nowy << ")\n";
-    for (int i = 0; i < path.size(); i++) {
-        cout << "(" << path[i].x << ", " << path[i].y << ") ";
+    for (int i = 0; i < pathWithTime.size(); i++) {
+        cout << "(" << pathWithTime[i].x << ", " << pathWithTime[i].y << ") ";
         if ((i + 1) % 10 == 0)
             cout << '\n';
     }

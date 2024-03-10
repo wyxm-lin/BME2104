@@ -19,7 +19,6 @@ public:
     vector <pair<int, int> > pathToBeDelete;
     int pathIndex = 0;
     bool IsPathGenerated = false; // NOTE Consideration of whether the variable is needed
-    vector <NodeWithTime > path;
 
     int NowFrame = 0;
     unordered_set<NodeWithTime> NodeWithTimeSet;
