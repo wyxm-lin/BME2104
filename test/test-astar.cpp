@@ -36,7 +36,7 @@ int main() {
     robot[0].ValueLimit = 0;
     robot[0].IsWorking = true;
     
-    AstarTest(robot, atlas, 1.0, 1);
+    AstarTimeEpsilon(robot[0], atlas, 1.0);
 
     // AstarConsiderTime(robot, atlas, 1.0, 1);
 

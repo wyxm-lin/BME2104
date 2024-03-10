@@ -23,19 +23,17 @@ void Robot::TakeOrder(Item it) {
     targetY = it.y;
     targetport = it.destination;
     IsWorking = true;
-    IsPathGenerated = false; // FIXME this variable is for debug
 }
 
 void Robot::move() {
-    if (pathIndex == -1)
+    if (pathIndex == -2) // no path to move (this variable is for debug when search path)
         return;
 
     // Stop
+    ++ pathIndex;
     if(pathWithTime[pathIndex].x == nowx && pathWithTime[pathIndex].y == nowy){
-        pathIndex++;
         return;
     }
-    
     //Move
     if (pathWithTime[pathIndex].x == nowx + 1) {
         printf("move %d %d\n", id, DOWN);
@@ -50,12 +48,12 @@ void Robot::move() {
         printf("move %d %d\n", id, LEFT);
     }
     NodeWithTimeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position
-    pathIndex++;
 }
 
 void Robot::DropItem() {
     IsWorking = false;
     IsCarry = false;
+    pathIndex = -1;
     printf("pull %d\n", id);
 }
 
@@ -64,6 +62,7 @@ void Robot::TakeItem(int NewX, int NewY) {
     targetX = NewX;
     targetY = NewY;
     printf("get %d\n", id);
+    // FIXME not set ItemMap[x][y] = NULL
 }
 
 /************Below variables and functions are for debug***************/

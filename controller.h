@@ -52,11 +52,6 @@ public:
     void ItemTimeOutDisappear(int frameID);
 
     /**
-     * @brief 
-    */
-    void Schedule();
-
-    /**
      * @brief robot runs
     */
     void RobotActByFrame();

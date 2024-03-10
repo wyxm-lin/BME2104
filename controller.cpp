@@ -112,12 +112,9 @@ void Controller::RunByFrame() {
         cin >> OKstring;
         // Read 'OK'
 
-        avoidCollison(robot, atlas);
+        // avoidCollison(robot, atlas);
         RobotActByFrame();
         GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
-
-        // Schedule();
-        // Print();
 
         printf("OK\n");
         fflush(stdout);
@@ -132,8 +129,8 @@ void Controller::ItemUpdateByFrame(int frameID) {
         cin >> x >> y >> val;
         int aimid = -1, nowadis = INF;
         for(int j = 0; j < PortNumber; j++) { // search for the nearest port
-            int disj = port[j].GetDis(x, y);
-            if(disj == -1) continue; //unreachable
+            int disj = port[j].GetDis(x, y); // get the distance to the port j (this is color)
+            if(disj == -1) continue; // unreachable
             if(disj < nowadis) nowadis = disj , aimid = j;
         }
         if(aimid == -1) continue;
@@ -158,27 +155,16 @@ void Controller::ItemTimeOutDisappear(int frameID) {
     }
 }
 
-/**
- * @brief abandon the function
- * 
- */
-void Controller::Schedule() {
-    for (int i = 0; i < RobotNumber; i++) {
-        if (robot[i].IsWorking == true && robot[i].HasFirstTakenOrder == false) { // FIXME use a variable to debug
-            robot[i].HasFirstTakenOrder = true;
-            if (robot[i].IsPathGenerated == false) {
-                SearchPath(robot[i], atlas);
-                robot[i].IsPathGenerated = true;
-            }
-        }
-    }
-}
-
 void Controller::RobotActByFrame() {
     for(int i = 0; i < RobotNumber; i++) {
         if(robot[i].IsAvailable == false) {
+            if (robot[i].RecoverFlag == false) {
+                robot[i].RecoverFlag = true;
+                robot[i].pathIndex --;
+            }
             continue;
         }
+        robot[i].RecoverFlag = false;
         if(robot[i].IsWorking == false) {
             continue;
         }

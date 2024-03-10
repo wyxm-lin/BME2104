@@ -52,3 +52,7 @@ set_target_properties(test-two_robot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJE
 add_executable(test-ten_robot ${PROJECT_SOURCE_DIR}/test/test-ten_robot.cpp)
 target_link_libraries(test-ten_robot CodeCraft)
 set_target_properties(test-ten_robot PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
+add_executable(test-move_check ${PROJECT_SOURCE_DIR}/test/test-move_check.cpp)
+target_link_libraries(test-move_check CodeCraft)
+set_target_properties(test-move_check PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)

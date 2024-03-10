@@ -23,12 +23,12 @@ int main() {
     // for(int i = 2; i < RobotNumber; i ++) {
     //     BME2104.robot[i].ValueLimit = 100000;
     // }
-    for(int i = 0; i < 5; i++) {
-        BME2104.port[i].open();
-    }
-    for(int i = 5; i < PortNumber; i++) {
-        BME2104.port[i].close();
-    }
+    // for(int i = 0; i < 5; i++) {
+    //     BME2104.port[i].open();
+    // }
+    // for(int i = 5; i < PortNumber; i++) {
+    //     BME2104.port[i].close();
+    // }
     
     BME2104.RunByFrame();
     return 0;

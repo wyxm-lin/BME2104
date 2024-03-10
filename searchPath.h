@@ -8,27 +8,6 @@ using std::bitset;
 class Atlas;
 class Robot;
 
-struct Node {
-    int x, y;
-    int g, h;
-
-    Node() = default;
-    ~Node() = default;
-
-    Node(int _x, int _y, int _g, int _h) : x(_x), y(_y), g(_g), h(_h) {}
-
-    bool operator < (const Node &b) const {
-        return g + h > b.g + b.h;
-    }
-    
-};
-
-void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[RobotNumber]);
-void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas);
-void SearchPath(Robot &robot, Atlas& atlas);
-void astar(Robot &robot, Atlas& atlas);
-void astarEpsilon(Robot &robot, Atlas& atlas, double epsilon);
-
 struct NodeWithTime {
     int x, y, Time;
     int g, h;
@@ -59,7 +38,9 @@ namespace std {
     };
 }
 
-void AstarTest(Robot (&robots)[RobotNumber], Atlas &atlas, double epsilon, int NowFrame);
+void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[RobotNumber]);
+void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas);
+void SearchPath(Robot &robot, Atlas& atlas);
 void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon);
 
 #endif

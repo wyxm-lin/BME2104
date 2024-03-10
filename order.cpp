@@ -15,9 +15,9 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
     vector <Order> ords[RobotNumber]; 
     while (Q.size()) {
         Item it = Q.front(); Q.pop();
-        if(port[it.destination].isopen() == false) continue;
+        if(port[it.destination].isopen() == false) continue; // NOTE: this is for debug
         if (it != ItemMap[it.x][it.y]) { // this item has been taken, just kick out
-            continue; 
+            continue; // NOTE: what does it mean?
         }
         // if(it.isbooked()) continue;
         if (ItemMap[it.x][it.y].isbooked()) 
@@ -26,6 +26,10 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
         }
         int aimport = it.destination;
         for (int i = 0; i < RobotNumber; i++) {
+            if (atlas.color[robot[i].nowx][robot[i].nowy] != atlas.color[port[aimport].x][port[aimport].y]) { // robot and port are not in the same area
+                continue;
+            }
+
             if (robot[i].UnableTakeOrder()) {
                 continue;
             }
@@ -35,7 +39,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             Order ord;
             ord.DisItemToPort = port[aimport].GetDis(it.x, it.y);
             // ord.DisRobotToItem =  // TODO
-            if(ord.DisRobotToItem + NowFrame + CONSTDELTA >= it.BirthFrame + ExistFrame) {  // FIXME: CONSTDELTA
+            if(ord.DisRobotToItem + NowFrame + CONSTDELTA >= it.BirthFrame + ExistFrame) {  // FIXME CONSTDELTA
                 continue;
             }
             ord.PortId = aimport;
@@ -50,6 +54,15 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
         if (robot[i].UnableTakeOrder()) {
             continue;
         }
+        // {
+        //     using std::fstream;
+        //     fstream out;
+        //     out.open("order.txt", std::ios::app);
+        //     out << "id is " << i << "will take order\n";
+        //     out << "frame is " << NowFrame << std::endl;
+        //     out << "the ord size is " << ords[i].size() << std::endl;
+        //     out.close();
+        // }
         sort(ords[i].begin(), ords[i].end());
         for(auto ord: ords[i]) {
             int px = ord.it.x;
@@ -62,6 +75,13 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             // AstarTest(robot, atlas, 1.0, NowFrame);
             // SearchPath(robot[i], atlas);
             AstarTimeEpsilon(robot[i], atlas, 1.0);
+            // {
+            //     using std::fstream;
+            //     fstream out;
+            //     out.open("order.txt", std::ios::app);                
+            //     out << ord.it.x << " " << ord.it.y << " " << ord.it.value << " " << ord.it.destination << " " << ord.val << std::endl;
+            //     out.close();
+            // }
             break;
         }
     }
