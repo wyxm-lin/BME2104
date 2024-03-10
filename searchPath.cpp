@@ -71,7 +71,7 @@ void astar(Robot &robot, Atlas& atlas) {
         elem = fa[elem.first][elem.second];
     }
     reverse(path.begin(), path.end());
-    robot.path = path;
+    robot.pathToBeDelete = path;
     robot.pathIndex = 0;
 }
 
@@ -126,7 +126,7 @@ void astarEpsilon(Robot &robot, Atlas& atlas, double epsilon) {
         elem = fa[elem.first][elem.second];
     }
     reverse(path.begin(), path.end());
-    robot.path = path;
+    robot.pathToBeDelete = path;
     robot.pathIndex = 0;
 }
 
@@ -201,12 +201,12 @@ void AstarTest(Robot (&robots)[RobotNumber], Atlas &atlas, double epsilon, int N
                 Last = fa[Last];
             }
             reverse(path.begin(), path.end());
-            robots[id].path = path;
+            robots[id].pathToBeDelete = path;
             robots[id].pathIndex = 0;
         }
         else {
             // TODO 没有找到路径
-            robots[id].path = vector<pair<int, int> >();
+            robots[id].pathToBeDelete = vector<pair<int, int> >();
             robots[id].pathIndex = -1;
         }
     }

@@ -29,16 +29,16 @@ void Robot::TakeOrder(Item it) {
 void Robot::move() {
     if (pathIndex == -1)
         return;
-    if (path[pathIndex].first == nowx + 1) {
+    if (path[pathIndex].x == nowx + 1) {
         printf("move %d %d\n", id, DOWN);
     }
-    else if (path[pathIndex].first == nowx - 1) {
+    else if (path[pathIndex].x == nowx - 1) {
         printf("move %d %d\n", id, UP);
     }
-    else if (path[pathIndex].second == nowy + 1) {
+    else if (path[pathIndex].y == nowy + 1) {
         printf("move %d %d\n", id, RIGHT);
     }
-    else if (path[pathIndex].second == nowy - 1) {
+    else if (path[pathIndex].y == nowy - 1) {
         printf("move %d %d\n", id, LEFT);
     }
     pathWithTimeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position
@@ -65,7 +65,7 @@ void Robot::RobotPrintPath() {
     cout << "path.size is " << path.size() << endl;
     cout << "the start point is (" << nowx << ", " << nowy << ")\n";
     for (int i = 0; i < path.size(); i++) {
-        cout << "(" << path[i].first << ", " << path[i].second << ") ";
+        cout << "(" << path[i].x << ", " << path[i].y << ") ";
         if ((i + 1) % 10 == 0)
             cout << '\n';
     }
