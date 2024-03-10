@@ -33,14 +33,14 @@ void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[Robo
 
 void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
     bitset <RobotNumber> passThrough[MapSize][MapSize];
-    memset(passThrough, 0, sizeof(passThrough));
+    // memset(passThrough, 0, sizeof(passThrough));
 
     // search for collision without time
     bitsetReset(passThrough, robot);
 
     // add time
     bool modifyFlag = false;
-    for(int time = 1; time <= FrameLimit - robot[0].NowFrame; time++){
+    for(int time = 0; time <= FrameLimit - robot[0].NowFrame; time++){
         if(modifyFlag) {
             break;
         }
@@ -50,15 +50,18 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
             // passThrough[robot[i1].pathWithTime[time].x][robot[i1].pathWithTime[time].y].reset(i1);
 
             // collision on area
-            if(passThrough[robot[i1].pathWithTime[time].x][robot[i1].pathWithTime[time].y].count() > 1) {
+            int p1 = robot[i1].pathIndex + time;
+            if(passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y].count() > 1) {
+                // robot path search index
+                
 
                 // timeNin is the time when the robot enter the area
                 // timeNout is the time when the robot leave the area but STILL IN the area
-                int time1in = time, time1out = time, time2in = 0, time2out = 0;
-                int i2 = passThrough[robot[i1].pathWithTime[time].x][robot[i1].pathWithTime[time].y]._Find_next(i1);    // i1 is strictly less than i2
+                int time1in = p1, time1out = p1, time2in = 0, time2out = 0;
+                int i2 = passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y]._Find_next(i1);    // i1 is strictly less than i2
 
                 // find time1out
-                for(int timeCheck = time; timeCheck <robot[i1].pathWithTime.size(); timeCheck++) {
+                for(int timeCheck = p1; timeCheck <robot[i1].pathWithTime.size(); timeCheck++) {
                     if(passThrough[robot[i1].pathWithTime[timeCheck].x][robot[i1].pathWithTime[timeCheck].y].test(i2)) {
                         continue;
                     } else {
@@ -68,7 +71,8 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
                 }
                 
                 // check time dimension to see if i1 & i2 collide in time
-                for(int timeCheck = time; timeCheck < robot[i2].pathWithTime.size(); timeCheck++) {
+                int p2 = robot[i1].pathIndex + time;
+                for(int timeCheck = p2; timeCheck < robot[i2].pathWithTime.size(); timeCheck++) {
                     if(time2in == 0 && passThrough[robot[i2].pathWithTime[timeCheck].x][robot[i2].pathWithTime[timeCheck].y].test(i1)) {
                         // first get in the area
                         time2in = timeCheck;
