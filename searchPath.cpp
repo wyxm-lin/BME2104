@@ -11,6 +11,11 @@ void SearchPath(Robot &robot, Atlas& atlas) {
     astar(robot, atlas);
 }
 
+void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
+    
+
+}
+
 void astar(Robot &robot, Atlas& atlas) {
     if (!robot.IsWorking) {
         return;

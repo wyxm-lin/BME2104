@@ -156,6 +156,10 @@ void Controller::ItemTimeOutDisappear(int frameID) {
     }
 }
 
+/**
+ * @brief abandon the function
+ * 
+ */
 void Controller::Schedule() {
     for (int i = 0; i < RobotNumber; i++) {
         if (robot[i].IsWorking == true && robot[i].HasFirstTakenOrder == false) { // FIXME use a variable to debug
