@@ -21,6 +21,8 @@ struct Node {
     
 };
 
+void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[RobotNumber]);
+void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas);
 void SearchPath(Robot &robot, Atlas& atlas);
 void astar(Robot &robot, Atlas& atlas);
 void astarEpsilon(Robot &robot, Atlas& atlas, double epsilon);
