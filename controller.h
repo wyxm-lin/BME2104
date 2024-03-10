@@ -19,6 +19,7 @@ public:
     Atlas atlas;
     queue <Item> ItemList;
     Item ItemMap[MapSize][MapSize];
+    int NowFrame = 0;
 
     //ItemMap should be cleared after the robot actually take the item, it is a up-to-time map
 

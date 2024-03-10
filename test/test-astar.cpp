@@ -25,16 +25,22 @@ int main() {
 
     atlas.AtlasPrintMap();
 
-    Robot robot;
-    robot.IsWorking = true;
-    robot.nowx = 50;
-    robot.nowy = 20;
-    robot.targetX = 50;
-    robot.targetY = 80;
+    Robot robot[RobotNumber];
+    robot[0].IsWorking = true;
+    robot[0].nowx = 50;
+    robot[0].nowy = 20;
+    robot[0].targetX = 50;
+    robot[0].targetY = 80;
+    robot[0].IsAvailable = true;
+    robot[0].IsCarry = false;
+    robot[0].ValueLimit = 0;
+    robot[0].IsWorking = true;
     
-    astar(robot, atlas);
+    AstarTest(robot, atlas, 1.0, 1);
 
-    robot.RobotPrintPath();
+    // AstarConsiderTime(robot, atlas, 1.0, 1);
+
+    robot[0].RobotPrintPath();
 
     return 0;
 }
