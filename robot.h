@@ -23,7 +23,7 @@ public:
     int pathIndex;
 
     Robot(): id(-1), nowx(-1), nowy(-1), targetX(-1), targetY(-1), targetport(-1), IsCarry(false), IsAvailable(true), 
-            IsWorking(false), ValueLimit(0), RecoverFlag(false), pathIndex(-1), UnavailableMoment(0)
+            IsWorking(false), ValueLimit(-1), RecoverFlag(false), pathIndex(-1), UnavailableMoment(0)
             {
                 OccupiedNodeSet.clear();
                 pathWithTime.clear();

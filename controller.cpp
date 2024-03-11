@@ -137,6 +137,7 @@ void Controller::ItemUpdateByFrame(int frameID) {
         cin >> x >> y >> val;
         int aimid = -1, nowadis = INF;
         for(int j = 0; j < PortNumber; j++) { // search for the nearest port
+            if (port[j].isopen() == false) continue; // this port is closed
             int disj = port[j].GetDis(x, y); // get the distance to the port j (this is color)
             if(disj == -1) continue; // unreachable
             if(disj < nowadis) nowadis = disj , aimid = j;
@@ -200,10 +201,10 @@ void Controller::RobotMove() {
             }
             continue;
         }
+        robot[i].UnavailableMoment = 0; // recover this flag
         if (robot[i].IsWorking == false) {
             continue;
         }
-        robot[i].UnavailableMoment = 0; // recover this flag
         robot[i].move();
     }
 }
