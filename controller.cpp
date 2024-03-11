@@ -156,11 +156,20 @@ void Controller::ItemTimeOutDisappear(int frameID) {
 }
 
 void Controller::RobotActByFrame() {
+    bool IsAvailableExist = false;
+    for (int i = 0; i < RobotNumber; i++) {
+        if (robot[i].IsAvailable == false) {
+            IsAvailableExist = true;
+            break;
+        }
+    }
+        
     for(int i = 0; i < RobotNumber; i++) {
         if (robot[i].IsAvailable == false) {
             if (robot[i].RecoverFlag == false) {
                 robot[i].RecoverFlag = true;
                 robot[i].pathIndex --;
+                AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot); // TODO need to check why it is not working
             }
             continue;
         }
@@ -174,6 +183,9 @@ void Controller::RobotActByFrame() {
                 robot[i].DropItem();
             }
             else {
+                // if (IsAvailableExist) {
+                //     AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot);
+                // }
                 robot[i].move();
             }
         }
