@@ -15,11 +15,9 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
     vector <Order> ords[RobotNumber]; 
     while (Q.size()) {
         Item it = Q.front(); Q.pop();
-        if(port[it.destination].isopen() == false) continue; // NOTE: this is for debug
         if (it != ItemMap[it.x][it.y]) { // this item has been taken, just kick out
             continue; // NOTE: what does it mean?
         }
-        // if(it.isbooked()) continue;
         if (ItemMap[it.x][it.y].isbooked()) 
         {
             continue;
@@ -27,6 +25,15 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
         int aimport = it.destination;
         for (int i = 0; i < RobotNumber; i++) {
             if (atlas.color[robot[i].nowx][robot[i].nowy] != atlas.color[port[aimport].x][port[aimport].y]) { // robot and port are not in the same area
+                {
+                    using std::fstream;
+                    fstream out;
+                    out.open("log.txt", std::ios::app);
+                    out << "robot and port are not in the same area\n";
+                    out << "robot is at " << robot[i].nowx << " " << robot[i].nowy << std::endl;
+                    out << "port is at " << port[aimport].x << " " << port[aimport].y << std::endl;
+                    out.close();
+                }
                 continue;
             }
 
