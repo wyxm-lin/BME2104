@@ -70,7 +70,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             }
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
-            AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot);
+            AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot);
             break;
         }
     }

@@ -141,8 +141,7 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
                 // }
 
                 // TODO: detect collision, research path
-
-
+                AstarTimeEpsilonWithConflict(robot[i2], atlas, EPSILON, robot);
                 // robot[i2].pathWithTime = pathModify;
                 bitsetReset(passThrough, robot);
                 modifyFlag = true;
@@ -192,6 +191,7 @@ void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
                 continue;
             }
             NodeWithTime use4Search = NodeWithTime(nextX, nextY, NextTime, now.g + 1, epsilon * (abs(nextX - targetX) + abs(nextY - targetY) + abs(NextTime - NowFrame)));
+            // NodeWithTime use4Search = NodeWithTime(nextX, nextY, NextTime, now.g + 1, epsilon * (abs(nextX - targetX) + abs(nextY - targetY)));
             vis[nextX][nextY] = true; // add this line 
             fa[use4Search] = now;
             openList.push(use4Search);
@@ -251,6 +251,7 @@ void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Ro
                 continue;
             }
             NodeWithTime use4Search = NodeWithTime(nextX, nextY, NextTime, now.g + 1, epsilon * (abs(nextX - targetX) + abs(nextY - targetY) + abs(NextTime - NowFrame)));
+            // NodeWithTime use4Search = NodeWithTime(nextX, nextY, NextTime, now.g + 1, epsilon * (abs(nextX - targetX) + abs(nextY - targetY)));
             NodeWithTime NowTimeNextPos = NodeWithTime(nextX, nextY, Time, 0, 0);
             NodeWithTime NextTimeNowPos = NodeWithTime(x, y, NextTime, 0, 0);
 

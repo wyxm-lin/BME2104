@@ -11,6 +11,7 @@ endif (!WIN32)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
+
 add_compile_options(-O2)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

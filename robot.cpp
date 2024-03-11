@@ -11,6 +11,26 @@ void Robot::update(int x, int y, bool carry, bool available, int frameID) {
     IsCarry = carry, IsAvailable = available;
     NowFrame = frameID;
     OccupiedNodeSet.insert(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // occupied the current position
+    {
+        if (id == 1 && 1400 <= NowFrame && NowFrame <= 2000) {
+            {
+                using std::fstream;
+                fstream out;
+                out.open("log.txt", std::ios::app);
+                out << "frame is " << NowFrame << std::endl;
+                out << "robot 1 is at " << nowx << " " << nowy << std::endl;
+                for (int i = 0; i < pathWithTime.size(); i++) {
+                    out << "(" << pathWithTime[i].x << ", " << pathWithTime[i].y << ") ";
+                    if ((i + 1) % 10 == 0)
+                        out << '\n';
+                }
+                out << "\n";
+                out << IsAvailable << " " << IsCarry << " " << IsWorking << std::endl;
+                out << targetX << " " << targetY << " " << targetport << std::endl;
+                out.close();
+            }
+        }
+    }
 }
 
 bool Robot::UnableTakeOrder() { // FIXME how to define UnableTakeOrder
@@ -37,6 +57,17 @@ void Robot::pull() {
     pathWithTime.clear(); // clear the path
     pathIndex = -1; // set invalid
     printf("pull %d\n", id);
+    if (id == 1 && 1400 <= NowFrame && NowFrame <= 1600) {
+        {
+            using std::fstream;
+            fstream out;
+            out.open("log.txt", std::ios::app);
+            out << "frame is " << NowFrame << std::endl;
+            out << "robot 1 is at " << nowx << " " << nowy << std::endl;
+            out << "robot 1 pull\n";
+            out.close();
+        }
+    }
 }
 
 void Robot::get(int PortX, int PortY) {

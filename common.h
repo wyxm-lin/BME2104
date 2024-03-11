@@ -28,6 +28,7 @@ const int dy[] = {1, -1, 0, 0};
 const int INF = 0x3f3f3f3f;
 const int CONSTDELTA = 500; // FIXME
 const int TotalFrame = 15000;
+const double EPSILON = 1.0;
 
 enum MapStatus {
     EMPTY = 0, // empty areas

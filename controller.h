@@ -59,6 +59,9 @@ public:
     void RobotMove();
 
     void ShipSchedule();
+
+    /**********************not use in this project********************************/
+    void RobotUnavailableSearchNewPath();
 };
 
 #endif

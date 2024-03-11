@@ -117,7 +117,7 @@ void Controller::RunByFrame() {
         RobotPull();
         GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
         RobotGet();
-        // avoidCollison(robot, atlas); // FIXME this function have bugs
+        // avoidCollison(robot, atlas); // NOTE this function 
         RobotMove();
         
         ShipSchedule();
@@ -185,7 +185,7 @@ void Controller::RobotGet() {
             ItemMap[robot[i].targetX][robot[i].targetY] = EmptyItem; // kick out 
             int aimport = robot[i].targetport; // task switch
             robot[i].get(port[aimport].x, port[aimport].y);
-            AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot); // search path because task switch
+            AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search path because task switch
         }
     } 
 }
@@ -195,11 +195,11 @@ void Controller::RobotMove() {
         if (robot[i].IsAvailable == false) {
             if (robot[i].UnavailableMoment == 0) {
                 robot[i].UnavailableMoment = NowFrame;
-                AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot); // search new path because this robot is unavailable
+                AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because this robot is unavailable
             }
             else if (robot[i].UnavailableMoment + 20 <= robot[i].NowFrame) { // new crash occured
                 robot[i].UnavailableMoment += 10; // FIXME estimate after 10 frames, a new crash occured
-                AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot); // search new path because a new crash occured
+                AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because a new crash occured
             }
             continue;
         }
@@ -241,6 +241,22 @@ void Controller::ShipSchedule() {
         }
         else if (ship[i].status == WAITING) {
             // TODO
+        }
+    }
+}
+
+/*****************************not use in this project****************************/
+void Controller::RobotUnavailableSearchNewPath() {
+    for (int i = 0; i < RobotNumber; i++) {
+        if (robot[i].IsAvailable == false) {
+            if (robot[i].UnavailableMoment == 0) {
+                robot[i].UnavailableMoment = NowFrame;
+                AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because this robot is unavailable
+            }
+            else if (robot[i].UnavailableMoment + 20 <= robot[i].NowFrame) { // new crash occured
+                robot[i].UnavailableMoment += 10; // FIXME estimate after 10 frames, a new crash occured
+                AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because a new crash occured
+            }
         }
     }
 }
