@@ -42,5 +42,6 @@ void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[Robo
 void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas);
 void SearchPath(Robot &robot, Atlas& atlas);
 void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon);
+void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Robot (&otherRobot)[RobotNumber]);
 
 #endif

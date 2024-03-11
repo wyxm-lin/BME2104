@@ -54,15 +54,6 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
         if (robot[i].UnableTakeOrder()) {
             continue;
         }
-        // {
-        //     using std::fstream;
-        //     fstream out;
-        //     out.open("order.txt", std::ios::app);
-        //     out << "id is " << i << "will take order\n";
-        //     out << "frame is " << NowFrame << std::endl;
-        //     out << "the ord size is " << ords[i].size() << std::endl;
-        //     out.close();
-        // }
         sort(ords[i].begin(), ords[i].end());
         for(auto ord: ords[i]) {
             int px = ord.it.x;
@@ -74,14 +65,8 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             robot[i].TakeOrder(ord.it);
             // AstarTest(robot, atlas, 1.0, NowFrame);
             // SearchPath(robot[i], atlas);
-            AstarTimeEpsilon(robot[i], atlas, 1.0);
-            // {
-            //     using std::fstream;
-            //     fstream out;
-            //     out.open("order.txt", std::ios::app);                
-            //     out << ord.it.x << " " << ord.it.y << " " << ord.it.value << " " << ord.it.destination << " " << ord.val << std::endl;
-            //     out.close();
-            // }
+            // AstarTimeEpsilon(robot[i], atlas, 1.0);
+            AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot);
             break;
         }
     }

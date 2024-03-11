@@ -56,3 +56,6 @@ set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_
 # add_executable(test-move_check ${PROJECT_SOURCE_DIR}/test/test-move_check.cpp)
 # target_link_libraries(test-move_check CodeCraft)
 # set_target_properties(test-move_check PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
+# add_executable(test-astarVex ${PROJECT_SOURCE_DIR}/test/test-astarVex.cpp)
+# set_target_properties(test-astarVex PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)

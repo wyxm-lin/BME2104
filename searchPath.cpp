@@ -17,11 +17,7 @@ void SearchPath(Robot &robot, Atlas& atlas) {
 }
 
 void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[RobotNumber]) {
-    for(int i = 0; i < MapSize; i++) {
-        for(int j = 0; j < MapSize; j++) {
-            a[i][j].reset();
-        }
-    }
+    memset(a, 0, sizeof(a));
 
     for(int i = 0; i < RobotNumber; i++) {
         if(robot[i].IsWorking) {
@@ -31,22 +27,22 @@ void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[Robo
         }
     }
 
-    // {
-    //     if(robot[0].NowFrame != 1) {
-    //         fstream out;
-    //         out.open("bitsetReset1.txt", std::ios::app);
+    {
+        if(robot[0].NowFrame != 1) {
+            fstream out;
+            out.open("bitsetReset1.txt");
             
-    //         for(int i = 0; i < MapSize; i++) {
-    //             for(int j = 0; j < MapSize; j++) {
-    //                 out << a[i][j] << " ";
-    //             }
-    //             out << std::endl;
-    //         }
-    //         out << "-------------- "<< robot[0].NowFrame << "--------------" << std::endl;
-    //         out.close();
-    //     }
+            for(int i = 0; i < MapSize; i++) {
+                for(int j = 0; j < MapSize; j++) {
+                    out << a[i][j] << " ";
+                }
+                out << std::endl;
+            }
+            out << "-------------- "<< robot[0].NowFrame << "--------------" << std::endl;
+            out.close();
+        }
     
-    // }
+    }
 }
 
 void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
@@ -71,9 +67,20 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
     //     }
     // }
 
+    // check max search time
+    int SearchMaxTime = 0;
+    for(int i=0; i<RobotNumber; i++){
+        if(robot[i].pathWithTime.size() > SearchMaxTime){
+            SearchMaxTime = robot[i].pathWithTime.size();
+        }
+    }
+    if(!SearchMaxTime) return;
+
+    
     // add time
     bool modifyFlag = false;
-    for(int time = 0; time <= FrameLimit - robot[0].NowFrame; time++){ // time is offset
+    for(int time = 0; time < SearchMaxTime; time++){ // time is offset
+
         if(modifyFlag) {
             break;
         }
@@ -82,10 +89,12 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
                 continue;
             }
 
-            // passThrough[robot[i1].pathWithTime[time].x][robot[i1].pathWithTime[time].y].reset(i1);
-
             // collision on area
             int p1 = robot[i1].pathIndex + time;
+            if(p1 >= robot[i1].pathWithTime.size()) {
+                continue;
+            }
+
             if (passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y].count() > 1) { // space conflict, time conflict maybe not exist
                 // robot path search index
 
@@ -102,8 +111,13 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
                 // {
                 //     fstream out;
                 //     out.open("avoidCollison1.txt", std::ios::app);
-                //     out << i1 << " " << time1in << " " << time1out << std::endl;
-                //     out << i2 << " " << time2in << " " << time2out << std::endl;
+                //     if(time1in == 55){
+                //         out << i1 << " " << time1in << " " << time1out << std::endl;
+                //         out << i2 << " " << time2in << " " << time2out << std::endl;
+                //         out << robot[i1].pathWithTime[p1].x << " " << robot[i1].pathWithTime[p1].y << std::endl;
+                //         out << passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y] << std::endl;
+                //     }
+                    
                 //     out.close();
                 // }
 
@@ -194,35 +208,33 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
                     cntTime++;
                 }
 
-                // {
-                //     fstream out;
-                //     out.open("avoidCollison1.txt", std::ios::app);
-                //     out << i1 << " " << time1in << " " << time1out << std::endl;
-                //     out << i2 << " " << time2in << " " << time2out << std::endl;
+                {
+                    fstream out;
+                    out.open("avoidCollison1.txt", std::ios::app);
+                    out << i1 << " " << time1in << " " << time1out << std::endl;
+                    out << i2 << " " << time2in << " " << time2out << std::endl;
 
-                //     out << "------------i1----------------" << std::endl;
-                //     for(int i = 0; i < robot[i1].pathWithTime.size(); i++) {
-                //         out << robot[i1].pathWithTime[i].x << " " << robot[i1].pathWithTime[i].y << " " << robot[i1].pathWithTime[i].Time << std::endl;
-                //     }
-                //     out << "------------i2----------------" << std::endl;
-                //     for(int i = 0; i < robot[i2].pathWithTime.size(); i++) {
-                //         out << robot[i2].pathWithTime[i].x << " " << robot[i2].pathWithTime[i].y << " " << robot[i2].pathWithTime[i].Time << std::endl;
-                //     }
-                //     out << "------------i2----------------" << std::endl;
-                //     for(int i = 0; i < pathModify.size(); i++) {
-                //         out << pathModify[i].x << " " << pathModify[i].y << " " << pathModify[i].Time << std::endl;
-                //     }
-                //     out.close();
-                // }
+                    out << "------------i1----------------" << std::endl;
+                    for(int i = 0; i < robot[i1].pathWithTime.size(); i++) {
+                        out << robot[i1].pathWithTime[i].x << " " << robot[i1].pathWithTime[i].y << " " << robot[i1].pathWithTime[i].Time << std::endl;
+                    }
+                    out << "------------i2----------------" << std::endl;
+                    for(int i = 0; i < robot[i2].pathWithTime.size(); i++) {
+                        out << robot[i2].pathWithTime[i].x << " " << robot[i2].pathWithTime[i].y << " " << robot[i2].pathWithTime[i].Time << std::endl;
+                    }
+                    out << "------------i2----------------" << std::endl;
+                    for(int i = 0; i < pathModify.size(); i++) {
+                        out << pathModify[i].x << " " << pathModify[i].y << " " << pathModify[i].Time << std::endl;
+                    }
+                    out.close();
+                }
 
                 robot[i2].pathWithTime = pathModify;
                 bitsetReset(passThrough, robot);
                 modifyFlag = true;
             }
-            // passThrough[robot[i1].pathWithTime[time].x][robot[i1].pathWithTime[time].y].set(i1);
         }
     }
-
 }
 
 void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
@@ -280,5 +292,92 @@ void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
     reverse(pathWithTime.begin(), pathWithTime.end());
     robot.pathWithTime = pathWithTime;
     robot.pathIndex = 0; // add this line NOTE: set pathIndex to 0
-    robot.NodeWithTimeSet.insert(pathWithTime.begin(), pathWithTime.end());
+    robot.OccupiedNodeSet.insert(pathWithTime.begin(), pathWithTime.end());
+}
+
+void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Robot (&otherRobot)[RobotNumber]) {
+    int NowRobotId = robot.id;
+    if (!robot.IsWorking) {
+        return;
+    }
+    int NowFrame = robot.NowFrame;
+
+    unordered_map<NodeWithTime, NodeWithTime> fa;
+
+    priority_queue <NodeWithTime> openList;
+    int startX = robot.nowx, startY = robot.nowy;   
+    int targetX = robot.targetX, targetY = robot.targetY;
+    NodeWithTime start = NodeWithTime(startX, startY, NowFrame, 0, epsilon * (abs(startX - targetX) + abs(startY - targetY)));
+    openList.push(start);
+    fa[start] = start;
+    NodeWithTime Last;
+
+    bool vis[MapSize + 5][MapSize + 5];
+    memset(vis, false, sizeof(vis));
+    vis[startX][startY] = true;
+
+    while (!openList.empty()) {
+        NodeWithTime now = openList.top();
+        openList.pop();
+        int x = now.x, y = now.y, Time = now.Time;
+        Last = now;
+        if (x == targetX && y == targetY) {
+            break;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int nextX = x + dx[i], nextY = y + dy[i], NextTime = Time + 1;
+            if (valid(nextX, nextY) == false) {
+                continue;
+            }
+            if (reachable(atlas.atlas[nextX][nextY], atlas.atlas[x][y]) == false) {
+                continue;
+            }
+            if (vis[nextX][nextY]) { // has visited
+                continue;
+            }
+            NodeWithTime use4Search = NodeWithTime(nextX, nextY, NextTime, now.g + 1, epsilon * (abs(nextX - targetX) + abs(nextY - targetY) + abs(NextTime - NowFrame)));
+            NodeWithTime NowTimeNextPos = NodeWithTime(nextX, nextY, Time, 0, 0);
+            NodeWithTime NextTimeNowPos = NodeWithTime(x, y, NextTime, 0, 0);
+
+            bool NoConflict = true;
+            for (int other = 0; other < RobotNumber; other ++) {
+                if (other == NowRobotId) {
+                    continue;
+                }
+                if (otherRobot[other].OccupiedNodeSet.empty()) {
+                    continue;
+                }
+                unordered_set<NodeWithTime>& otherRobotNodeWithTimeSet = otherRobot[other].OccupiedNodeSet;
+                if ( otherRobotNodeWithTimeSet.find(use4Search) != otherRobotNodeWithTimeSet.end() || // vertex conflict
+                    otherRobotNodeWithTimeSet.find(NowTimeNextPos) != otherRobotNodeWithTimeSet.end() && otherRobotNodeWithTimeSet.find(NextTimeNowPos) != otherRobotNodeWithTimeSet.end()) // edge conflict
+                {
+                    NoConflict = false;
+                    break;
+                }
+            }
+            if (NoConflict == false) {
+                continue;
+            }
+            else {  
+                vis[nextX][nextY] = true; // add this line 
+                fa[use4Search] = now;
+                openList.push(use4Search);
+            }
+        }
+    }
+    if (Last.x == targetX && Last.y == targetY) {
+        vector<NodeWithTime> pathWithTime; // pathWithTime is (start, targe]
+        while (Last != start) {
+            pathWithTime.push_back(Last);
+            Last = fa[Last];
+        }
+        reverse(pathWithTime.begin(), pathWithTime.end());
+        robot.pathWithTime = pathWithTime;
+        robot.pathIndex = 0; // add this line NOTE: set pathIndex to 0
+        robot.OccupiedNodeSet.insert(pathWithTime.begin(), pathWithTime.end());
+    }
+    else {
+        AstarTimeEpsilon(robot, atlas, epsilon); // if no path and no conflict, use AstarTimeEpsilon
+    }
 }
