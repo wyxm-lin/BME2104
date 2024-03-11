@@ -1,10 +1,12 @@
 #include "util.h"
 #include "robot.h"
 #include "searchPath.h"
+#include <fstream>
 
 using std::cout;
 using std::endl;
 using std::bitset;
+using std::fstream;
 
 void Robot::update(int x, int y, bool carry, bool available, int frameID) {
     nowx = x, nowy = y;
@@ -26,6 +28,8 @@ void Robot::TakeOrder(Item it) {
 }
 
 void Robot::move() {
+    fstream file;
+    file.open("robot.txt", std::ios::app);
     if (pathIndex == -1) // no path to move (this variable is for debug when search path)
         return;
     // Stop
@@ -35,18 +39,24 @@ void Robot::move() {
     }
     else if (pathWithTime[pathIndex].x == nowx + 1) { //Move
         printf("move %d %d\n", id, DOWN);
+        file << "move " << id << " " << DOWN << endl;
     }
     else if (pathWithTime[pathIndex].x == nowx - 1) {
         printf("move %d %d\n", id, UP);
+        file << "move " << id << " " << UP << endl;
     }
     else if (pathWithTime[pathIndex].y == nowy + 1) {
         printf("move %d %d\n", id, RIGHT);
+        file << "move " << id << " " << RIGHT << endl;
     }
     else if (pathWithTime[pathIndex].y == nowy - 1) {
         printf("move %d %d\n", id, LEFT);
+        file << "move " << id << " " << LEFT << endl;
     }
     // NodeWithTimeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position // NOTE: not used now in this project
     ++ pathIndex;
+
+    file.close();
 }
 
 void Robot::DropItem() {

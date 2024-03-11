@@ -1,5 +1,6 @@
 #include "util.h"
 #include "controller.h"
+#include <fstream>
 
 
 using std::string;
@@ -7,6 +8,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::pair;
+using std::fstream;
 
 void Controller::Init() {
     for(int i = 0, robotid = -1; i < MapSize; i++) {
@@ -74,9 +76,14 @@ void Controller::PreProcess() {
 }
 
 void Controller::RunByFrame() {
+    fstream file;
+    file.open("robot.txt", std::ios::out | std::ios::app);
+    
+
     int nowamoney = 0;
     while(NowFrame < FrameLimit) {
         cin >> NowFrame >> nowamoney;
+        file << "--------------" << NowFrame << "--------------" << endl;
         ItemUpdateByFrame(NowFrame);
 
         //FIXME
@@ -112,13 +119,40 @@ void Controller::RunByFrame() {
         cin >> OKstring;
         // Read 'OK'
 
-        avoidCollison(robot, atlas);
-        RobotActByFrame();
+        file << OKstring << std::endl;
+
         GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
+        {
+            for(int i = 0; i < RobotNumber; i++) {
+                if(!robot[i].IsWorking) continue;
+                file << "---------" << i << "---------" << std::endl;
+                for(int j=0; j < robot[i].pathWithTime.size(); j++) {
+                    file << robot[i].pathWithTime[j].x << " " << robot[i].pathWithTime[j].y << std::endl;
+                }
+            }
+            
+        }
+        avoidCollison(robot, atlas);
+        {
+            fstream file2;
+            file2.open("robot2.txt", std::ios::app);
+            for(int i = 0; i < RobotNumber; i++) {
+                if(!robot[i].IsWorking) continue;
+                file2 << "---------" << i << "---------" << std::endl;
+                for(int j=0; j < robot[i].pathWithTime.size(); j++) {
+                    file2 << robot[i].pathWithTime[j].x << " " << robot[i].pathWithTime[j].y << std::endl;
+                }
+            }
+            file2.close();
+            
+        }
+        RobotActByFrame();
+        
 
         printf("OK\n");
         fflush(stdout);
     }
+    file.close();
 }
 
 void Controller::ItemUpdateByFrame(int frameID) {
@@ -156,8 +190,12 @@ void Controller::ItemTimeOutDisappear(int frameID) {
 }
 
 void Controller::RobotActByFrame() {
+    fstream file;
+    file.open("robot.txt", std::ios::app);
+    file.close();
     for(int i = 0; i < RobotNumber; i++) {
         if(robot[i].IsAvailable == false) {
+            file << robot[i].id << " is not available" << endl;
             if (robot[i].RecoverFlag == false) {
                 robot[i].RecoverFlag = true;
                 robot[i].pathIndex --;
@@ -166,8 +204,10 @@ void Controller::RobotActByFrame() {
         }
         robot[i].RecoverFlag = false;
         if(robot[i].IsWorking == false) {
+            file << robot[i].id << " is not working" << endl;
             continue;
         }
+        file << robot[i].id << " is working" << endl;
         if(robot[i].IsCarry) {
             int aimport = robot[i].targetport;
             if(port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {

@@ -2,6 +2,7 @@
 #include "searchPath.h"
 #include "robot.h"
 #include "atlas.h"
+#include <fstream>
 
 using std::priority_queue;
 using std::pair;
@@ -29,6 +30,23 @@ void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[Robo
             }
         }
     }
+
+    // {
+    //     if(robot[0].NowFrame != 1) {
+    //         fstream out;
+    //         out.open("bitsetReset1.txt", std::ios::app);
+            
+    //         for(int i = 0; i < MapSize; i++) {
+    //             for(int j = 0; j < MapSize; j++) {
+    //                 out << a[i][j] << " ";
+    //             }
+    //             out << std::endl;
+    //         }
+    //         out << "-------------- "<< robot[0].NowFrame << "--------------" << std::endl;
+    //         out.close();
+    //     }
+    
+    // }
 }
 
 void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
@@ -37,6 +55,21 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
 
     // search for collision without time
     bitsetReset(passThrough, robot);
+
+    // {
+    //     if(robot[0].NowFrame == 2){
+    //         fstream out;
+    //         out.open("avoidCollison.txt", std::ios::app);
+    //         for(int i = 0; i < MapSize; i++) {
+    //             for(int j = 0; j < MapSize; j++) {
+    //                 out << passThrough[i][j] << " ";
+    //             }
+    //             out << std::endl;
+    //         }
+    //         out << "-------------- "<< robot[0].NowFrame << "--------------" << std::endl;
+    //         out.close();
+    //     }
+    // }
 
     // add time
     bool modifyFlag = false;
@@ -55,12 +88,25 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
             int p1 = robot[i1].pathIndex + time;
             if (passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y].count() > 1) { // space conflict, time conflict maybe not exist
                 // robot path search index
-                
 
                 // timeNin is the time when the robot enter the area
                 // timeNout is the time when the robot leave the area but STILL IN the area
                 int time1in = p1, time1out = p1, time2in = 0, time2out = 0;
-                int i2 = passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y]._Find_next(i1);    // i1 is strictly less than i2 
+                //int i2 = passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y]._Find_next(i1);
+                
+                int i2 = passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y]._Find_first();
+                if(i2 == i1) {
+                    i2 = passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y]._Find_next(i2);
+                }
+
+                // {
+                //     fstream out;
+                //     out.open("avoidCollison1.txt", std::ios::app);
+                //     out << i1 << " " << time1in << " " << time1out << std::endl;
+                //     out << i2 << " " << time2in << " " << time2out << std::endl;
+                //     out.close();
+                // }
+
                 // NOTE above line: if have more than one conflict, how to deal?
 
                 // find time1out
@@ -96,20 +142,79 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
                     continue;
                 }
 
+                // get in the area in the same direction and NOT in the same time
+                // TODO: redundant search
+                if(robot[i1].pathWithTime[time1out].x == robot[i2].pathWithTime[time2out].x && robot[i1].pathWithTime[time1out].y == robot[i2].pathWithTime[time2out].y\
+                    && time1out != time2out) {
+                    continue;
+                }
+
+                // {
+                //     fstream out;
+                //     out.open("avoidCollison1.txt", std::ios::app);
+                //     out << robot[i1].pathIndex << " " << time << std::endl;
+                //     out << robot[i2].pathIndex << " " << time << std::endl;
+                    
+                //     out.close();
+                // }
+
+                // {
+                //     fstream out;
+                //     out.open("avoidCollison1.txt", std::ios::app);
+                //     out << i1 << " " << time1in << " " << time1out << std::endl;
+                //     out << i2 << " " << time2in << " " << time2out << std::endl;
+
+                //     out << "------------i1----------------" << std::endl;
+                //     out << robot[i1].pathWithTime[time1in].x << " " << robot[i1].pathWithTime[time1in].y << " " << robot[i1].pathWithTime[time1in].Time << std::endl;
+                //     out << robot[i1].pathWithTime[time1out].x << " " << robot[i1].pathWithTime[time1out].y << " " << robot[i1].pathWithTime[time1out].Time << std::endl;
+                //     out << "------------i2----------------" << std::endl;
+                //     out << robot[i2].pathWithTime[time2in].x << " " << robot[i2].pathWithTime[time2in].y << " " << robot[i2].pathWithTime[time2in].Time << std::endl;
+                //     out << robot[i2].pathWithTime[time2out].x << " " << robot[i2].pathWithTime[time2out].y << " " << robot[i2].pathWithTime[time2out].Time << std::endl;
+                //     out.close();
+                // }
+
                 // if collision in time
                 // i1 gets into the area first
                 // set i2 to stop until i1 get out of the area
                 vector<NodeWithTime> pathModify;
                 int StopTime = time1out - time2in + 1;
+                int cntTime = robot[i2].pathWithTime[0].Time;
                 for(int timeCheck = 0; timeCheck < robot[i2].pathWithTime.size() + StopTime; timeCheck++) {
                     if(timeCheck < time2in) { // head
                         pathModify.push_back(robot[i2].pathWithTime[timeCheck]);
                     } else if(timeCheck >= time2in && timeCheck < time2in + StopTime) { // mid 
-                        pathModify.push_back(robot[i2].pathWithTime[time2in - 1]); // stop at the same position
+                        NodeWithTime tmp = robot[i2].pathWithTime[time2in - 1];
+                        tmp.Time = cntTime;
+                        pathModify.push_back(tmp); // stop at the same position
                     } else { // tail
-                        pathModify.push_back(robot[i2].pathWithTime[timeCheck - StopTime]);
+                        NodeWithTime tmp = robot[i2].pathWithTime[timeCheck - StopTime];
+                        tmp.Time = cntTime;
+                        pathModify.push_back(tmp);
                     }
+                    cntTime++;
                 }
+
+                // {
+                //     fstream out;
+                //     out.open("avoidCollison1.txt", std::ios::app);
+                //     out << i1 << " " << time1in << " " << time1out << std::endl;
+                //     out << i2 << " " << time2in << " " << time2out << std::endl;
+
+                //     out << "------------i1----------------" << std::endl;
+                //     for(int i = 0; i < robot[i1].pathWithTime.size(); i++) {
+                //         out << robot[i1].pathWithTime[i].x << " " << robot[i1].pathWithTime[i].y << " " << robot[i1].pathWithTime[i].Time << std::endl;
+                //     }
+                //     out << "------------i2----------------" << std::endl;
+                //     for(int i = 0; i < robot[i2].pathWithTime.size(); i++) {
+                //         out << robot[i2].pathWithTime[i].x << " " << robot[i2].pathWithTime[i].y << " " << robot[i2].pathWithTime[i].Time << std::endl;
+                //     }
+                //     out << "------------i2----------------" << std::endl;
+                //     for(int i = 0; i < pathModify.size(); i++) {
+                //         out << pathModify[i].x << " " << pathModify[i].y << " " << pathModify[i].Time << std::endl;
+                //     }
+                //     out.close();
+                // }
+
                 robot[i2].pathWithTime = pathModify;
                 bitsetReset(passThrough, robot);
                 modifyFlag = true;
