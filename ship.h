@@ -8,7 +8,9 @@ public:
     int id, capacity, target;
     ShipStatus status;
 
-    Ship() = default;
+    int NotMoveMoment;
+
+    Ship():id(-1), capacity(-1), target(-1), status(ShipStatus::SHIPPING), NotMoveMoment(-1) {}
     ~Ship() = default;
 
     /**

@@ -82,17 +82,17 @@ void Controller::RunByFrame() {
         ItemUpdateByFrame(NowFrame);
 
         //FIXME
-        if(NowFrame == 1) {
-            for(int i = 0; i < 5; i++) {
-                ship[i].MoveToPort(i);
-            }
-        }
+        // if(NowFrame == 1) {
+        //     for(int i = 0; i < 5; i++) {
+        //         ship[i].MoveToPort(i);
+        //     }
+        // }
         
-        if(NowFrame == 13500) {
-            for(int i = 0; i < 5; i++) {
-                ship[i].Sell();
-            }
-        }
+        // if(NowFrame == 13500) {
+        //     for(int i = 0; i < 5; i++) {
+        //         ship[i].Sell();
+        //     }
+        // }
 
         //FIXME
 
@@ -120,6 +120,8 @@ void Controller::RunByFrame() {
         // avoidCollison(robot, atlas); // FIXME this function have bugs
         RobotMove();
         
+        ShipSchedule();
+
         printf("OK\n");
         fflush(stdout);
     }
@@ -206,5 +208,38 @@ void Controller::RobotMove() {
             continue;
         }
         robot[i].move();
+    }
+}
+
+void Controller::ShipSchedule() {
+    if (NowFrame == 1) {
+        for (int i = 0; i < ShipNumber; i++) {
+            ship[i].MoveToPort(i);
+        }
+        return;
+    }
+    for (int i = 0; i < ShipNumber; i++) {
+        if (ship[i].status == SHIPPING) {
+            if (ship[i].target == -1) {
+                ship[i].MoveToPort(i);
+            }
+            else {
+                if (ship[i].NotMoveMoment == -1) {
+                    ship[i].NotMoveMoment = NowFrame;
+                }
+                else {
+                    if (ship[i].NotMoveMoment + 150 <= NowFrame) { // 1000 frames for loading item
+                        ship[i].Sell();
+                        ship[i].NotMoveMoment = -1;
+                    }
+                }
+            }
+        }
+        else if (ship[i].status == MOVING) {
+            // do nothing
+        }
+        else if (ship[i].status == WAITING) {
+            // TODO
+        }
     }
 }

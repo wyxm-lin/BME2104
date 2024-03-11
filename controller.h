@@ -58,6 +58,7 @@ public:
     void RobotGet();
     void RobotMove();
 
+    void ShipSchedule();
 };
 
 #endif
