@@ -17,14 +17,14 @@ public:
     int ValueLimit; // when value >= ValueLimit, this robot work
     bool RecoverFlag = false; // this variable is for debug when search path
     int NowFrame = 0;
-    unordered_set<NodeWithTime> NodeWithTimeSet;
+    unordered_set<NodeWithTime> OccupiedNodeSet;
     vector<NodeWithTime> pathWithTime;
     int pathIndex;
 
     Robot(): id(-1), nowx(-1), nowy(-1), targetX(-1), targetY(-1), targetport(-1), IsCarry(false), IsAvailable(true), 
             IsWorking(false), ValueLimit(0), RecoverFlag(false),pathIndex(0) 
             {
-                NodeWithTimeSet.clear();
+                OccupiedNodeSet.clear();
                 pathWithTime.clear();
             }
     ~Robot() = default;

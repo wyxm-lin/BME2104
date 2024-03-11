@@ -175,7 +175,7 @@ void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
     reverse(pathWithTime.begin(), pathWithTime.end());
     robot.pathWithTime = pathWithTime;
     robot.pathIndex = 0; // add this line NOTE: set pathIndex to 0
-    robot.NodeWithTimeSet.insert(pathWithTime.begin(), pathWithTime.end());
+    robot.OccupiedNodeSet.insert(pathWithTime.begin(), pathWithTime.end());
 }
 
 void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Robot (&otherRobot)[RobotNumber]) {
@@ -228,10 +228,10 @@ void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Ro
                 if (other == NowRobotId) {
                     continue;
                 }
-                if (otherRobot[other].NodeWithTimeSet.empty()) {
+                if (otherRobot[other].OccupiedNodeSet.empty()) {
                     continue;
                 }
-                unordered_set<NodeWithTime>& otherRobotNodeWithTimeSet = otherRobot[other].NodeWithTimeSet;
+                unordered_set<NodeWithTime>& otherRobotNodeWithTimeSet = otherRobot[other].OccupiedNodeSet;
                 if ( otherRobotNodeWithTimeSet.find(use4Search) != otherRobotNodeWithTimeSet.end() || // vertex conflict
                     otherRobotNodeWithTimeSet.find(NowTimeNextPos) != otherRobotNodeWithTimeSet.end() && otherRobotNodeWithTimeSet.find(NextTimeNowPos) != otherRobotNodeWithTimeSet.end()) // edge conflict
                 {
@@ -258,7 +258,7 @@ void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Ro
         reverse(pathWithTime.begin(), pathWithTime.end());
         robot.pathWithTime = pathWithTime;
         robot.pathIndex = 0; // add this line NOTE: set pathIndex to 0
-        robot.NodeWithTimeSet.insert(pathWithTime.begin(), pathWithTime.end());
+        robot.OccupiedNodeSet.insert(pathWithTime.begin(), pathWithTime.end());
     }
     else {
         AstarTimeEpsilon(robot, atlas, epsilon); // if no path and no conflict, use AstarTimeEpsilon

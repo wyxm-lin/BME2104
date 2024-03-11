@@ -157,7 +157,7 @@ void Controller::ItemTimeOutDisappear(int frameID) {
 
 void Controller::RobotActByFrame() {
     for(int i = 0; i < RobotNumber; i++) {
-        if(robot[i].IsAvailable == false) {
+        if (robot[i].IsAvailable == false) {
             if (robot[i].RecoverFlag == false) {
                 robot[i].RecoverFlag = true;
                 robot[i].pathIndex --;
@@ -165,12 +165,12 @@ void Controller::RobotActByFrame() {
             continue;
         }
         robot[i].RecoverFlag = false;
-        if(robot[i].IsWorking == false) {
+        if (robot[i].IsWorking == false) {
             continue;
         }
-        if(robot[i].IsCarry) {
+        if (robot[i].IsCarry) {
             int aimport = robot[i].targetport;
-            if(port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
+            if (port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
                 robot[i].DropItem();
             }
             else {
@@ -178,7 +178,7 @@ void Controller::RobotActByFrame() {
             }
         }
         else {
-            if(robot[i].nowx == robot[i].targetX && robot[i].nowy == robot[i].targetY) {
+            if (robot[i].nowx == robot[i].targetX && robot[i].nowy == robot[i].targetY) {
                 ItemMap[robot[i].targetX][robot[i].targetY] = EmptyItem;
                 int aimport = robot[i].targetport;
                 robot[i].TakeItem(port[aimport].x, port[aimport].y);
