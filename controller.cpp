@@ -112,7 +112,7 @@ void Controller::RunByFrame() {
         cin >> OKstring;
         // Read 'OK'
 
-        avoidCollison(robot, atlas);
+        // avoidCollison(robot, atlas); // FIXME this function have bugs
         RobotActByFrame();
         GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
 
@@ -184,7 +184,8 @@ void Controller::RobotActByFrame() {
                 robot[i].TakeItem(port[aimport].x, port[aimport].y);
                 // SearchPath(robot[i], atlas);
                 // AstarTest(robot, atlas, 1.0, NowFrame); // FIXME
-                AstarTimeEpsilon(robot[i], atlas, 1.0);
+                // AstarTimeEpsilon(robot[i], atlas, 1.0);
+                AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot);
             }
             robot[i].move();
         }

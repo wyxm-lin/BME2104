@@ -74,7 +74,8 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             robot[i].TakeOrder(ord.it);
             // AstarTest(robot, atlas, 1.0, NowFrame);
             // SearchPath(robot[i], atlas);
-            AstarTimeEpsilon(robot[i], atlas, 1.0);
+            // AstarTimeEpsilon(robot[i], atlas, 1.0);
+            AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot);
             // {
             //     using std::fstream;
             //     fstream out;
