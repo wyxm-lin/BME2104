@@ -224,12 +224,13 @@ void Controller::ShipSchedule() {
                 ship[i].MoveToPort(i);
             }
             else {
-                if (ship[i].NotMoveMoment == -1) {
+                if (ship[i].NotMoveMoment == -1)
                     ship[i].NotMoveMoment = NowFrame;
-                }
-                else {
-                    if (ship[i].NotMoveMoment + 150 <= NowFrame) { // 1000 frames for loading item
+                if (ship[i].HaveLoad < ship[i].capacity) {
+                    ship[i].HaveLoad += port[i].velocity;
+                    if (ship[i].HaveLoad >= ship[i].capacity || ship[i].NotMoveMoment + 50 <= NowFrame) {
                         ship[i].Sell();
+                        ship[i].HaveLoad = 0;
                         ship[i].NotMoveMoment = -1;
                     }
                 }
