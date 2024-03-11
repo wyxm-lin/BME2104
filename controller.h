@@ -52,9 +52,12 @@ public:
     void ItemTimeOutDisappear(int frameID);
 
     /**
-     * @brief robot runs
+     * @brief Robot All possible action
     */
-    void RobotActByFrame();
+    void RobotPull();
+    void RobotGet();
+    void RobotMove();
+
 };
 
 #endif

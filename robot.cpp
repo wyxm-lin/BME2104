@@ -13,9 +13,10 @@ void Robot::update(int x, int y, bool carry, bool available, int frameID) {
     OccupiedNodeSet.insert(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // occupied the current position
 }
 
-bool Robot::UnableTakeOrder() {
-    if(IsAvailable == false) return true;
-    if(IsWorking == true) return true;
+bool Robot::UnableTakeOrder() { // FIXME how to define UnableTakeOrder
+    if (IsAvailable == false) return true;
+    if (IsWorking == true) return true;
+    // if (IsCarry == true) return true;
     return false;
 }
 
@@ -26,42 +27,51 @@ void Robot::TakeOrder(Item it) {
     IsWorking = true;
 }
 
+void Robot::pull() {
+    IsWorking = false;
+    IsCarry = false;
+    targetX = targetY = targetport = -1; // invalid
+    for (int i = pathIndex; i < pathWithTime.size(); i++) { // erase unused position
+        OccupiedNodeSet.erase(pathWithTime[i]);
+    }
+    pathWithTime.clear(); // clear the path
+    pathIndex = -1; // set invalid
+    printf("pull %d\n", id);
+}
+
+void Robot::get(int PortX, int PortY) {
+    if (IsAvailable == false || IsCarry == true || IsWorking == false) {
+        return;
+    }
+    if (nowx == targetX && nowy == targetY) {
+        targetX = PortX;
+        targetY = PortY;
+        IsCarry = true;
+        printf("get %d\n", id);
+    }
+}
+
 void Robot::move() {
     if (pathIndex == -1) // no path to move (this variable is for debug when search path)
-        return;
-    // Stop
-    if (pathWithTime[pathIndex].x == nowx && pathWithTime[pathIndex].y == nowy) {
+        return; 
+    if (pathWithTime[pathIndex].x == nowx && pathWithTime[pathIndex].y == nowy) { // wait
         ++ pathIndex;
         return;
     }
-    else if (pathWithTime[pathIndex].x == nowx + 1) { //Move
+    else if (pathWithTime[pathIndex].x == nowx + 1) { // down
         printf("move %d %d\n", id, DOWN);
     }
-    else if (pathWithTime[pathIndex].x == nowx - 1) {
+    else if (pathWithTime[pathIndex].x == nowx - 1) { // up
         printf("move %d %d\n", id, UP);
     }
-    else if (pathWithTime[pathIndex].y == nowy + 1) {
+    else if (pathWithTime[pathIndex].y == nowy + 1) { // right
         printf("move %d %d\n", id, RIGHT);
     }
-    else if (pathWithTime[pathIndex].y == nowy - 1) {
+    else if (pathWithTime[pathIndex].y == nowy - 1) { // left
         printf("move %d %d\n", id, LEFT);
     }
     OccupiedNodeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position
     ++ pathIndex;
-}
-
-void Robot::DropItem() {
-    IsWorking = false;
-    IsCarry = false;
-    pathIndex = -1;
-    printf("pull %d\n", id);
-}
-
-void Robot::TakeItem(int NewX, int NewY) {
-    IsCarry = true;
-    targetX = NewX;
-    targetY = NewY;
-    printf("get %d\n", id);
 }
 
 
