@@ -37,7 +37,6 @@ void Controller::Init() {
             }
         }
     }
-
     // atlas information finished
 
     for(int i = 0; i < PortNumber; i++) {
@@ -49,15 +48,17 @@ void Controller::Init() {
         port[id].T = T;
         port[id].velocity = v;
     }
-
     // port information finished
+
     int cap; cin >> cap;
     for(int i = 0; i < ShipNumber; i++) {
         ship[i].id = i;
         ship[i].capacity = cap;
     }
+    // ship information finished
 
     PreProcess();
+    // pre-process
 
     string OKstring;
     cin >> OKstring;
@@ -112,16 +113,21 @@ void Controller::RunByFrame() {
         cin >> OKstring;
         // Read 'OK'
 
-        // avoidCollison(robot, atlas); // FIXME this function have bugs
-        RobotActByFrame();
+        RobotPull();
         GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
-
+        RobotGet();
+        // avoidCollison(robot, atlas); // FIXME this function have bugs
+        RobotMove();
+        
         printf("OK\n");
         fflush(stdout);
     }
 }
 
 void Controller::ItemUpdateByFrame(int frameID) {
+    ItemTimeOutDisappear(frameID);
+    // Kick out disappeared items
+
     int NewItemCount;
     cin >> NewItemCount;
     for(int i = 1; i <= NewItemCount; i++) {
@@ -138,8 +144,6 @@ void Controller::ItemUpdateByFrame(int frameID) {
         ItemMap[x][y] = Item(frameID, x, y, val, aimid);
     }
     // Finish new item input
-    ItemTimeOutDisappear(frameID);
-    // Kick out disappeared items
 }
 
 void Controller::ItemTimeOutDisappear(int frameID) {
@@ -155,51 +159,49 @@ void Controller::ItemTimeOutDisappear(int frameID) {
     }
 }
 
-void Controller::RobotActByFrame() {
-    bool IsAvailableExist = false;
+void Controller::RobotPull() {
     for (int i = 0; i < RobotNumber; i++) {
-        if (robot[i].IsAvailable == false) {
-            IsAvailableExist = true;
-            break;
+        if (robot[i].IsAvailable == false || robot[i].IsWorking == false || robot[i].IsCarry == false) {
+            continue;
+        }
+        int aimport = robot[i].targetport;
+        if (port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
+            robot[i].pull();
         }
     }
-        
-    for(int i = 0; i < RobotNumber; i++) {
+}
+
+void Controller::RobotGet() {
+    for (int i = 0; i < RobotNumber; i ++) {
+        if (robot[i].IsAvailable == false || robot[i].IsWorking == false || robot[i].IsCarry == true) {
+            continue;
+        }
+        if (robot[i].nowx == robot[i].targetX && robot[i].nowy == robot[i].targetY) {
+            ItemMap[robot[i].targetX][robot[i].targetY] = EmptyItem; // kick out 
+            int aimport = robot[i].targetport; // task switch
+            robot[i].get(port[aimport].x, port[aimport].y);
+            AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot); // search path because task switch
+        }
+    } 
+}
+
+void Controller::RobotMove() {
+    for (int i = 0; i < RobotNumber; i++) {
         if (robot[i].IsAvailable == false) {
-            if (robot[i].RecoverFlag == false) {
-                robot[i].RecoverFlag = true;
-                robot[i].pathIndex --;
-                AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot); // TODO need to check why it is not working
+            if (robot[i].UnavailableMoment == 0) {
+                robot[i].UnavailableMoment = NowFrame;
+                AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot); // search new path because this robot is unavailable
+            }
+            else if (robot[i].UnavailableMoment + 20 <= robot[i].NowFrame) { // new crash occured
+                robot[i].UnavailableMoment += 10; // FIXME estimate after 10 frames, a new crash occured
+                AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot); // search new path because a new crash occured
             }
             continue;
         }
-        robot[i].RecoverFlag = false;
         if (robot[i].IsWorking == false) {
             continue;
         }
-        if (robot[i].IsCarry) {
-            int aimport = robot[i].targetport;
-            if (port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
-                robot[i].DropItem();
-            }
-            else {
-                // if (IsAvailableExist) {
-                //     AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot);
-                // }
-                robot[i].move();
-            }
-        }
-        else {
-            if (robot[i].nowx == robot[i].targetX && robot[i].nowy == robot[i].targetY) {
-                ItemMap[robot[i].targetX][robot[i].targetY] = EmptyItem;
-                int aimport = robot[i].targetport;
-                robot[i].TakeItem(port[aimport].x, port[aimport].y);
-                // SearchPath(robot[i], atlas);
-                // AstarTest(robot, atlas, 1.0, NowFrame); // FIXME
-                // AstarTimeEpsilon(robot[i], atlas, 1.0);
-                AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot);
-            }
-            robot[i].move();
-        }
+        robot[i].UnavailableMoment = 0; // recover this flag
+        robot[i].move();
     }
 }

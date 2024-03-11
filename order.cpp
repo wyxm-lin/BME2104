@@ -30,7 +30,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
                 continue;
             }
 
-            if (robot[i].UnableTakeOrder()) {
+            if (robot[i].UnableTakeOrder()) { // TODO think how to define this function to take order when in half way
                 continue;
             }
             if (it.value < robot[i].ValueLimit) {
@@ -72,17 +72,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             }
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
-            // AstarTest(robot, atlas, 1.0, NowFrame);
-            // SearchPath(robot[i], atlas);
-            // AstarTimeEpsilon(robot[i], atlas, 1.0);
             AstarTimeEpsilonWithConflict(robot[i], atlas, 1.0, robot);
-            // {
-            //     using std::fstream;
-            //     fstream out;
-            //     out.open("order.txt", std::ios::app);                
-            //     out << ord.it.x << " " << ord.it.y << " " << ord.it.value << " " << ord.it.destination << " " << ord.val << std::endl;
-            //     out.close();
-            // }
             break;
         }
     }
