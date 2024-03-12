@@ -26,5 +26,6 @@ struct Order {
 };
 
 void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize], Atlas &altas, int frameID);
+void tryRetakeOrder(Robot &robot);
 
 #endif

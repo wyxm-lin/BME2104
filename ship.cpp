@@ -7,10 +7,15 @@ void Ship::update(ShipStatus sta, int targ) {
 
 void Ship::MoveToPort(int tar) {
     printf("ship %d %d\n", id, tar);
+    afterMove = true;
     target = tar;
 }
 
 void Ship::Sell() {
     printf("go %d\n", id);
+    afterSell = true;
+    shipFull = false;
+    finishLoad = false;
+    HaveLoad = 0;
     target = -1;
 }

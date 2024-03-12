@@ -52,6 +52,18 @@ void Port::close() {
     openstatus = false;
 }
 
+void Port::pull(int value) {    // robot pull item
+    nowItemCnt++;
+    // nowItemValue += value;
+    totalItemCnt++;
+    // totalItemValue += value;
+}
+
+void Port::load(int actualLoadCnt) {   // ship load item
+    nowItemCnt -= actualLoadCnt;
+    // nowItemValue = 0;
+}
+
 
 /************Below variables and functions are for debug***************/
 void Port::PrintDis(int x_, int y_) {

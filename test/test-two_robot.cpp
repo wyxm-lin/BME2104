@@ -15,9 +15,9 @@ using namespace std;
 
 int main() {
     // clear the log.txt
-    fstream out;
-    out.open("log.txt", ios::out);
-    out.close();
+    // fstream out;
+    // out.open("log.txt", ios::out);
+    // out.close();
     Controller BME2104;
     BME2104.Init();
     for(int i = 2; i < RobotNumber; i ++) {

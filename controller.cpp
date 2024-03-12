@@ -120,7 +120,9 @@ void Controller::RunByFrame() {
         // avoidCollison(robot, atlas); // NOTE this function 
         RobotMove();
         
-        ShipSchedule();
+        AutoShipLoad();
+        // ShipSchedule();
+        ShipScheduleNew();
 
         printf("OK\n");
         fflush(stdout);
@@ -171,6 +173,7 @@ void Controller::RobotPull() {
         }
         int aimport = robot[i].targetport;
         if (port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
+            port[aimport].pull(robot[i].carryItem.value);
             robot[i].pull();
         }
     }
@@ -201,6 +204,8 @@ void Controller::RobotMove() {
                 robot[i].UnavailableMoment += 10; // FIXME estimate after 10 frames, a new crash occured
                 AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because a new crash occured
             }
+            // FIXME: not sure if this is the right way to handle this
+            tryRetakeOrder(robot[i]);
             continue;
         }
         robot[i].UnavailableMoment = 0; // recover this flag
@@ -240,6 +245,96 @@ void Controller::ShipSchedule() {
             // do nothing
         }
         else if (ship[i].status == WAITING) {
+            // TODO
+        }
+    }
+}
+
+void Controller::AutoShipLoad(){
+    for(int i = 0; i < ShipNumber; i++){
+        if(ship[i].status == SHIPPING){
+            if(ship[i].afterSell){  // at the virtual point
+                continue;
+            }
+            int portId = ship[i].target;
+            int v = port[portId].velocity;
+            int actualLoadCnt;  // change if the ship is full or port is empty
+            if((ship[i].HaveLoad + v <= ship[i].capacity) && (port[portId].nowItemCnt - v >= 0)){    // ship not full and port not empty
+                ship[i].HaveLoad += v;
+                actualLoadCnt = v;
+            }else if ((ship[i].HaveLoad + v > ship[i].capacity) || (port[portId].nowItemCnt - v < 0)){  // ship full or port empty
+                int shipRemain = ship[i].capacity - ship[i].HaveLoad;
+                int portRemain = port[portId].nowItemCnt;
+                if(shipRemain == portRemain){
+                    ship[i].HaveLoad = ship[i].capacity;
+                    ship[i].shipFull = true;
+                    ship[i].finishLoad = true;
+                    actualLoadCnt = portRemain;
+                }else if(shipRemain < portRemain){    // ship can be full
+                    ship[i].HaveLoad = ship[i].capacity;
+                    ship[i].shipFull = true;
+                    actualLoadCnt = shipRemain;
+                }else{                                // port can be empty
+                    ship[i].HaveLoad += portRemain;
+                    actualLoadCnt = portRemain;
+                    ship[i].finishLoad = true;
+                }
+            }
+            port[portId].load(actualLoadCnt);
+        }
+    }
+}
+
+void Controller::ShipScheduleNew(){
+    if (NowFrame == 1) {
+        for (int i = 0; i < ShipNumber; i++) {
+            ship[i].MoveToPort(i);
+            port[i].isbooked = true;
+        }
+        return;
+    }
+    // TODO: without considering the distance between the ship and the port
+    vector <Port> ports;
+    for(int i = 0; i < PortNumber; i++){
+        ports.push_back(port[i]);
+    }
+    // if(NowFrame < 2000) return; // just wait
+    for(int i = 0; i < ShipNumber; i++){
+        if(ship[i].status == SHIPPING){ 
+            if(ship[i].afterMove){   // ship just arrive at a new port
+                ship[i].afterMove = false;
+            }else if(ship[i].afterSell){    // ship just arrive at the virtual point
+                ship[i].afterSell = false;
+                sort(ports.begin(), ports.end());
+                for(auto port:ports){
+                    if(port.isbooked){
+                        continue;
+                    }
+                    port.isbooked = true;
+                    ship[i].MoveToPort(port.id);
+                    break;
+                }
+            }else if(ship[i].shipFull){   // ship is full, go to sell
+                port[ship[i].target].isbooked = false;
+                ship[i].Sell();
+            }else if(ship[i].finishLoad){   // ship is not full, but the port now is empty
+                port[ship[i].target].isbooked = false;  // FIXME: bug occured here
+                sort(ports.begin(), ports.end());
+                for(auto port:ports){
+                    if(port.isbooked){
+                        continue;
+                    }
+                    port.isbooked = true;
+                    ship[i].MoveToPort(port.id);
+                    ship[i].finishLoad = false;
+                    break;
+                }
+            }else{      // ship is simply loading
+                // do nothing
+            }
+        }else if(ship[i].status == MOVING){
+            // do nothing
+        }else if(ship[i].status == WAITING){
             // TODO
         }
     }

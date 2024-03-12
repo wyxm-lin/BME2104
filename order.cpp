@@ -25,15 +25,15 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
         int aimport = it.destination;
         for (int i = 0; i < RobotNumber; i++) {
             if (atlas.color[robot[i].nowx][robot[i].nowy] != atlas.color[port[aimport].x][port[aimport].y]) { // robot and port are not in the same area
-                {
-                    using std::fstream;
-                    fstream out;
-                    out.open("log.txt", std::ios::app);
-                    out << "robot and port are not in the same area\n";
-                    out << "robot is at " << robot[i].nowx << " " << robot[i].nowy << std::endl;
-                    out << "port is at " << port[aimport].x << " " << port[aimport].y << std::endl;
-                    out.close();
-                }
+                // {
+                //     using std::fstream;
+                //     fstream out;
+                //     out.open("log.txt", std::ios::app);
+                //     out << "robot and port are not in the same area\n";
+                //     out << "robot is at " << robot[i].nowx << " " << robot[i].nowy << std::endl;
+                //     out << "port is at " << port[aimport].x << " " << port[aimport].y << std::endl;
+                //     out.close();
+                // }
                 continue;
             }
 
@@ -45,8 +45,12 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             }
             Order ord;
             ord.DisItemToPort = port[aimport].GetDis(it.x, it.y);
-            // ord.DisRobotToItem =  // TODO
-            if(ord.DisRobotToItem + NowFrame + CONSTDELTA >= it.BirthFrame + ExistFrame) {  // FIXME CONSTDELTA
+            if(robot[i].oldPort == -1){     // the first order or order when the last item disapear
+                ord.DisRobotToItem = 400; // get a high value to make sure the robot will take the order
+            }else{  // other orders
+                ord.DisRobotToItem = port[robot[i].oldPort].GetDis(it.x, it.y);
+            }
+            if(ord.DisRobotToItem + ord.DisItemToPort + NowFrame >= it.BirthFrame + ExistFrame) {
                 continue;
             }
             ord.PortId = aimport;
@@ -73,5 +77,24 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot);
             break;
         }
+    }
+}
+
+void tryRetakeOrder(Robot &robot){
+    int remainDis = robot.pathWithTime.size() - robot.pathIndex;
+    Item it = robot.carryItem;
+    if(remainDis + robot.NowFrame + 20 >= it.BirthFrame + ExistFrame) {  // set a threshold to make sure the robot won't take the disappeared item
+        robot.carryItem = EmptyItem;
+        robot.IsCarry = false;
+        robot.IsWorking = false;
+        robot.oldPort = -1;  // work with order value calculate 
+        robot.targetX = robot.targetY = robot.targetport = -1;
+        for (int i = robot.pathIndex; i < robot.pathWithTime.size(); i++) {
+            robot.OccupiedNodeSet.erase(robot.pathWithTime[i]);
+        }
+        robot.pathWithTime.clear();
+        robot.pathIndex = -1;
+        return;
+        
     }
 }

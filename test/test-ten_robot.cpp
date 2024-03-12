@@ -15,19 +15,19 @@ using namespace std;
 
 int main() {
 
-    fstream out;
-    out.open("log.txt", ios::out);
-    out.close();
+    // fstream out;
+    // out.open("log.txt", ios::out);
+    // out.close();
     
     Controller BME2104;
     BME2104.Init();
 
-    for(int i = 0; i < 5; i++) {
-        BME2104.port[i].open();
-    }
-    for(int i = 5; i < PortNumber; i++) {
-        BME2104.port[i].close();
-    }
+    // for(int i = 0; i < 5; i++) {
+    //     BME2104.port[i].open();
+    // }
+    // for(int i = 5; i < PortNumber; i++) {
+    //     BME2104.port[i].close();
+    // }
     
     BME2104.RunByFrame();
     return 0;
