@@ -294,6 +294,7 @@ void Controller::ShipScheduleNew(){
         return;
     }
     // TODO: without considering the distance between the ship and the port
+    // TODO: last some frames, shut down 5 ports
     vector <Port> ports;
     for(int i = 0; i < PortNumber; i++){
         ports.push_back(port[i]);
@@ -318,7 +319,7 @@ void Controller::ShipScheduleNew(){
                 port[ship[i].target].isbooked = false;
                 ship[i].Sell();
             }else if(ship[i].finishLoad){   // ship is not full, but the port now is empty
-                port[ship[i].target].isbooked = false;  // FIXME: bug occured here
+                port[ship[i].target].isbooked = false;
                 sort(ports.begin(), ports.end());
                 for(auto port:ports){
                     if(port.isbooked){
