@@ -57,6 +57,10 @@ public:
     void RobotPull();
     void RobotGet();
     void RobotMove();
+    void RobotFakePull();
+    void RobotFakeGet();
+    void RobotRealPull();
+    void RobotRealGet();
 
     void AutoShipLoad();
     void ShipSchedule();

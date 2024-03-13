@@ -24,4 +24,12 @@ inline bool reachable (MapStatus x, MapStatus y) {
         return false;
 }
 
+inline bool InPortArea(int PortX, int PortY, int x, int y) {
+    if (PortX <= x && x <= PortX + 3 && PortY <= y && y <= PortY + 3) {
+        return true;
+    }
+    return false;
+}
+
+
 #endif

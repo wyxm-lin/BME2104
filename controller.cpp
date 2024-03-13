@@ -70,6 +70,7 @@ void Controller::Init() {
 
 void Controller::PreProcess() {
     atlas.ColorAtlas();
+    atlas.DegreeInit();
     for(int i = 0; i < PortNumber; i++){
         port[i].PortDisInit(&atlas);
     }
@@ -81,21 +82,6 @@ void Controller::RunByFrame() {
     while(NowFrame < FrameLimit) {
         cin >> NowFrame >> nowamoney;
         ItemUpdateByFrame(NowFrame);
-
-        //FIXME
-        // if(NowFrame == 1) {
-        //     for(int i = 0; i < 5; i++) {
-        //         ship[i].MoveToPort(i);
-        //     }
-        // }
-        
-        // if(NowFrame == 13500) {
-        //     for(int i = 0; i < 5; i++) {
-        //         ship[i].Sell();
-        //     }
-        // }
-
-        //FIXME
 
         for(int i = 0; i < RobotNumber; i++) {
             int carry, x, y, status;
@@ -115,12 +101,26 @@ void Controller::RunByFrame() {
         cin >> OKstring;
         // Read 'OK'
 
-        RobotPull();
-        GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
-        RobotGet();
-        // avoidCollison(robot, atlas); // NOTE this function 
-        RobotMove();
-        
+        {
+            // origin version
+            RobotPull();
+            GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
+            RobotGet();
+            // avoidCollison(robot, atlas); // NOTE this function 
+            RobotMove();
+        }   
+
+        // {
+        //     // new version (but the score almost less than origin version, need to think about it)
+        //     RobotRealPull(); // when the robot real get the pos, switch state
+        //     GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
+        //     RobotRealGet(); // when the robot real get the pos, switch state
+        //     // avoidCollison(robot, atlas); // NOTE this function 
+        //     RobotMove();
+        //     RobotFakePull();
+        //     RobotFakeGet();
+        // }
+
         AutoShipLoad();
         ShipSchedule();
 
@@ -141,7 +141,7 @@ void Controller::ItemUpdateByFrame(int frameID) {
         cin >> x >> y >> val;
         int aimid = -1, nowadis = INF;
         for(int j = 0; j < PortNumber; j++) { // search for the nearest port
-            if (port[j].isopen() == false) continue; // this port is closed
+            if (port[j].isopen() == false) continue; // NOTE this port is closed
             int disj = port[j].GetDis(x, y); // get the distance to the port j (this is color)
             if(disj == -1) continue; // unreachable
             if(disj < nowadis) nowadis = disj , aimid = j;
@@ -193,6 +193,50 @@ void Controller::RobotGet() {
     } 
 }
 
+void Controller::RobotFakePull() {
+    for (int i = 0; i < RobotNumber; i++) {
+        if (robot[i].IsAvailable == false || robot[i].IsWorking == false || robot[i].IsCarry == false) {
+            continue;
+        }
+        robot[i].FakePull(port[robot[i].targetport].x, port[robot[i].targetport].y);
+    }
+}
+
+void Controller::RobotRealPull() {
+    for (int i = 0; i < RobotNumber; i++) {
+        if (robot[i].IsAvailable == false || robot[i].IsWorking == false) {
+            continue;
+        }
+        int aimport = robot[i].targetport;
+        if (port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
+            port[aimport].pull(robot[i].carryItem.value);
+            robot[i].RealPull();
+        }
+    }
+}
+
+void Controller::RobotFakeGet() {
+    for (int i = 0; i < RobotNumber; i++) {
+        if (robot[i].IsAvailable == false || robot[i].IsWorking == false || robot[i].IsCarry == true) {
+            continue;
+        }
+        robot[i].FakeGet();
+    }
+}
+
+void Controller::RobotRealGet() {
+    for (int i = 0; i < RobotNumber; i++) {
+        if (robot[i].IsAvailable == false || robot[i].IsWorking == false) {
+            continue;
+        }
+        if (robot[i].nowx == robot[i].targetX && robot[i].nowy == robot[i].targetY) { 
+            ItemMap[robot[i].targetX][robot[i].targetY] = EmptyItem; // kick out 
+            robot[i].RealGet(port[robot[i].targetport].x, port[robot[i].targetport].y);
+            AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search path because task switch
+        }
+    }
+}
+
 void Controller::RobotMove() {
     for (int i = 0; i < RobotNumber; i++) {
         if (robot[i].IsAvailable == false) {
@@ -205,11 +249,15 @@ void Controller::RobotMove() {
                 AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because a new crash occured
             }
             // FIXME not sure if this is the right way to handle this
+            robot[i].NextX = robot[i].nowx;
+            robot[i].NextY = robot[i].nowy;
             tryRetakeOrder(robot[i]);
             continue;
         }
         robot[i].UnavailableMoment = 0; // recover this flag
         if (robot[i].IsWorking == false) {
+            robot[i].NextX = robot[i].nowx;
+            robot[i].NextY = robot[i].nowy;
             continue;
         }
         robot[i].move();

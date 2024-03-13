@@ -8,29 +8,10 @@ using std::bitset;
 
 void Robot::update(int x, int y, bool carry, bool available, int frameID) {
     nowx = x, nowy = y;
-    IsCarry = carry, IsAvailable = available;
+    IsCarry = carry;
+    IsAvailable = available;
     NowFrame = frameID;
     OccupiedNodeSet.insert(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // occupied the current position
-    // {
-    //     if (id == 1 && 1400 <= NowFrame && NowFrame <= 2000) {
-    //         {
-    //             using std::fstream;
-    //             fstream out;
-    //             out.open("log.txt", std::ios::app);
-    //             out << "frame is " << NowFrame << std::endl;
-    //             out << "robot 1 is at " << nowx << " " << nowy << std::endl;
-    //             for (int i = 0; i < pathWithTime.size(); i++) {
-    //                 out << "(" << pathWithTime[i].x << ", " << pathWithTime[i].y << ") ";
-    //                 if ((i + 1) % 10 == 0)
-    //                     out << '\n';
-    //             }
-    //             out << "\n";
-    //             out << IsAvailable << " " << IsCarry << " " << IsWorking << std::endl;
-    //             out << targetX << " " << targetY << " " << targetport << std::endl;
-    //             out.close();
-    //         }
-    //     }
-    // }
 }
 
 bool Robot::UnableTakeOrder() { // FIXME how to define UnableTakeOrder
@@ -48,6 +29,40 @@ void Robot::TakeOrder(Item it) {
     carryItem = it;
 }
 
+void Robot::FakeGet() {
+    // the next pos is target
+    if (NextX == targetX && NextY == targetY) {
+        printf("get %d\n", id);
+    }
+}
+
+void Robot::RealGet(int PortX, int PortY) {
+    if (nowx == targetX && nowy == targetY) {
+        targetX = PortX;
+        targetY = PortY;
+        IsCarry = true;
+    }
+}
+
+void Robot::FakePull(int PortX, int PortY) {
+    // next position(if next position have)
+    if (InPortArea(PortX, PortY, NextX, NextY)) {
+        printf("pull %d\n", id);
+    }
+}
+
+void Robot::RealPull() {
+    IsWorking = false;
+    IsCarry = false;
+    oldPort = targetport;
+    targetX = targetY = targetport = -1; // invalid
+    for (int i = pathIndex; i < pathWithTime.size(); i++) { // erase unused position
+        OccupiedNodeSet.erase(pathWithTime[i]);
+    }
+    pathWithTime.clear(); // clear the path
+    pathIndex = -1; // set invalid
+}
+
 void Robot::pull() {
     // robot
     IsWorking = false;
@@ -60,17 +75,6 @@ void Robot::pull() {
     pathWithTime.clear(); // clear the path
     pathIndex = -1; // set invalid
     printf("pull %d\n", id);
-    // if (id == 1 && 1400 <= NowFrame && NowFrame <= 1600) {
-    //     {
-    //         using std::fstream;
-    //         fstream out;
-    //         out.open("log.txt", std::ios::app);
-    //         out << "frame is " << NowFrame << std::endl;
-    //         out << "robot 1 is at " << nowx << " " << nowy << std::endl;
-    //         out << "robot 1 pull\n";
-    //         out.close();
-    //     }
-    // }
 }
 
 void Robot::get(int PortX, int PortY) {
@@ -85,23 +89,30 @@ void Robot::get(int PortX, int PortY) {
     }
 }
 
-void Robot::move() {
-    if (pathIndex == -1) // no path to move (this variable is for debug when search path)
+void Robot::move() { // maintain the (NextX, NextY)
+    if (pathIndex == -1) { // no path to move (this variable is for debug when search path)
+        NextX = nowx, NextY = nowy;
         return; 
+    }
     if (pathWithTime[pathIndex].x == nowx && pathWithTime[pathIndex].y == nowy) { // wait
+        NextX = pathWithTime[pathIndex].x, NextY = pathWithTime[pathIndex].y;
         ++ pathIndex;
         return;
     }
     else if (pathWithTime[pathIndex].x == nowx + 1) { // down
+        NextX = pathWithTime[pathIndex].x, NextY = pathWithTime[pathIndex].y;
         printf("move %d %d\n", id, DOWN);
     }
     else if (pathWithTime[pathIndex].x == nowx - 1) { // up
+        NextX = pathWithTime[pathIndex].x, NextY = pathWithTime[pathIndex].y;
         printf("move %d %d\n", id, UP);
     }
     else if (pathWithTime[pathIndex].y == nowy + 1) { // right
+        NextX = pathWithTime[pathIndex].x, NextY = pathWithTime[pathIndex].y;
         printf("move %d %d\n", id, RIGHT);
     }
     else if (pathWithTime[pathIndex].y == nowy - 1) { // left
+        NextX = pathWithTime[pathIndex].x, NextY = pathWithTime[pathIndex].y;
         printf("move %d %d\n", id, LEFT);
     }
     OccupiedNodeSet.erase(NodeWithTime(nowx, nowy, NowFrame, 0, 0)); // erase the current position

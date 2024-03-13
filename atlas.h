@@ -10,6 +10,8 @@ public:
     MapStatus atlas[MapSize][MapSize];
     int color[MapSize][MapSize];
     int ColorCount;
+    int degree[MapSize][MapSize];
+    void DegreeInit();
 
     Atlas() = default;
     ~Atlas() = default;

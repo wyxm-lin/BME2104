@@ -39,6 +39,22 @@ void Atlas::ColorAtlas() {
     }
 }
 
+void Atlas::DegreeInit() {
+    for (int i = 0; i < MapSize; i++) {
+        for (int j = 0; j < MapSize; j++) {
+            degree[i][j] = 0;
+            if (atlas[i][j] == WALL || atlas[i][j] == WATER) {
+                continue;
+            }
+            for (int k = 0; k < 4; k++) {
+                int x = i + dx[k], y = j + dy[k];
+                if (valid(x, y) && atlas[x][y] != WALL && atlas[x][y] != WATER) {
+                    degree[i][j]++;
+                }
+            }
+        }
+    }
+}
 
 /************Below variables and functions are for debug***************/
 void Atlas::AtlasInitByMapTxt(string path) {
