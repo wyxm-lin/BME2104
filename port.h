@@ -18,8 +18,8 @@ public:
     bool openstatus = true;
     Port() = default;
     ~Port() = default;
-    bool operator<(const Port p)const {
-        return nowItemCnt > p.nowItemCnt;
+    bool operator < (const Port& p) const {
+        return nowItemCnt < p.nowItemCnt;
     }
     /**
      * @brief Initize the dis

@@ -60,7 +60,6 @@ public:
 
     void AutoShipLoad();
     void ShipSchedule();
-    void ShipScheduleNew();
 
     /**********************not use in this project********************************/
     void RobotUnavailableSearchNewPath();

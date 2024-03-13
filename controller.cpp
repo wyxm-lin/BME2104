@@ -7,6 +7,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::pair;
+using std::priority_queue;
 
 void Controller::Init() {
     for(int i = 0, robotid = -1; i < MapSize; i++) {
@@ -121,8 +122,7 @@ void Controller::RunByFrame() {
         RobotMove();
         
         AutoShipLoad();
-        // ShipSchedule();
-        ShipScheduleNew();
+        ShipSchedule();
 
         printf("OK\n");
         fflush(stdout);
@@ -204,7 +204,7 @@ void Controller::RobotMove() {
                 robot[i].UnavailableMoment += 10; // FIXME estimate after 10 frames, a new crash occured
                 AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because a new crash occured
             }
-            // FIXME: not sure if this is the right way to handle this
+            // FIXME not sure if this is the right way to handle this
             tryRetakeOrder(robot[i]);
             continue;
         }
@@ -213,40 +213,6 @@ void Controller::RobotMove() {
             continue;
         }
         robot[i].move();
-    }
-}
-
-void Controller::ShipSchedule() {
-    if (NowFrame == 1) {
-        for (int i = 0; i < ShipNumber; i++) {
-            ship[i].MoveToPort(i);
-        }
-        return;
-    }
-    for (int i = 0; i < ShipNumber; i++) {
-        if (ship[i].status == SHIPPING) {
-            if (ship[i].target == -1) {
-                ship[i].MoveToPort(i);
-            }
-            else {
-                if (ship[i].NotMoveMoment == -1)
-                    ship[i].NotMoveMoment = NowFrame;
-                if (ship[i].HaveLoad < ship[i].capacity) {
-                    ship[i].HaveLoad += port[i].velocity;
-                    if (ship[i].HaveLoad >= ship[i].capacity || ship[i].NotMoveMoment + 50 <= NowFrame) {
-                        ship[i].Sell();
-                        ship[i].HaveLoad = 0;
-                        ship[i].NotMoveMoment = -1;
-                    }
-                }
-            }
-        }
-        else if (ship[i].status == MOVING) {
-            // do nothing
-        }
-        else if (ship[i].status == WAITING) {
-            // TODO
-        }
     }
 }
 
@@ -259,10 +225,10 @@ void Controller::AutoShipLoad(){
             int portId = ship[i].target;
             int v = port[portId].velocity;
             int actualLoadCnt;  // change if the ship is full or port is empty
-            if((ship[i].HaveLoad + v <= ship[i].capacity) && (port[portId].nowItemCnt - v >= 0)){    // ship not full and port not empty
+            if((ship[i].HaveLoad + v <= ship[i].capacity) && (port[portId].nowItemCnt - v > 0)){    // ship not full and port not empty
                 ship[i].HaveLoad += v;
                 actualLoadCnt = v;
-            }else if ((ship[i].HaveLoad + v > ship[i].capacity) || (port[portId].nowItemCnt - v < 0)){  // ship full or port empty
+            }else if ((ship[i].HaveLoad + v > ship[i].capacity) || (port[portId].nowItemCnt - v <= 0)){  // ship full or port empty
                 int shipRemain = ship[i].capacity - ship[i].HaveLoad;
                 int portRemain = port[portId].nowItemCnt;
                 if(shipRemain == portRemain){
@@ -280,12 +246,12 @@ void Controller::AutoShipLoad(){
                     ship[i].finishLoad = true;
                 }
             }
-            port[portId].load(actualLoadCnt);
+            port[portId].load(actualLoadCnt); // modify the port's nowItemCnt
         }
     }
 }
 
-void Controller::ShipScheduleNew(){
+void Controller::ShipSchedule(){
     if (NowFrame == 1) {
         for (int i = 0; i < ShipNumber; i++) {
             ship[i].MoveToPort(i);
@@ -293,53 +259,55 @@ void Controller::ShipScheduleNew(){
         }
         return;
     }
-    // TODO: without considering the distance between the ship and the port
-    // TODO: last some frames, shut down 5 ports
-    vector <Port> ports;
-    for(int i = 0; i < PortNumber; i++){
-        ports.push_back(port[i]);
+    // TODO without considering the distance between the ship and the port
+    // TODO last some frames, shut down 5 ports
+    priority_queue <Port> heap;
+    for (int i = 0; i < PortNumber; i++) {
+        if (port[i].isbooked) { // NOTE thick twice, observe the Time ship from Virtual point to port
+            continue;
+        }
+        heap.push(port[i]);
     }
-    // if(NowFrame < 2000) return; // just wait
-    for(int i = 0; i < ShipNumber; i++){
-        if(ship[i].status == SHIPPING){ 
-            if(ship[i].afterMove){   // ship just arrive at a new port
+    for (int i = 0; i < ShipNumber; i++) {
+        if (ship[i].status == SHIPPING) {
+            if (ship[i].afterMove) { // ship just arrive at a new port
                 ship[i].afterMove = false;
-            }else if(ship[i].afterSell){    // ship just arrive at the virtual point
+            }
+            else if (ship[i].afterSell) { // ship just arrive at the virtual point
                 ship[i].afterSell = false;
-                sort(ports.begin(), ports.end());
-                for(auto port:ports){
-                    if(port.isbooked){
-                        continue;
-                    }
-                    port.isbooked = true;
-                    ship[i].MoveToPort(port.id);
-                    break;
+                if (!heap.empty()) {
+                    int Id = heap.top().id;
+                    port[Id].isbooked = true;
+                    ship[i].MoveToPort(Id);
                 }
-            }else if(ship[i].shipFull){   // ship is full, go to sell
+            }
+            else if (ship[i].shipFull) { // ship is full, go to sell
                 port[ship[i].target].isbooked = false;
                 ship[i].Sell();
-            }else if(ship[i].finishLoad){   // ship is not full, but the port now is empty
+            }
+            else if (ship[i].finishLoad) { // ship is not full, but the port now is empty
                 port[ship[i].target].isbooked = false;
-                sort(ports.begin(), ports.end());
-                for(auto port:ports){
-                    if(port.isbooked){
-                        continue;
-                    }
-                    port.isbooked = true;
-                    ship[i].MoveToPort(port.id);
+                if (!heap.empty()) {
+                    int Id = heap.top().id;
+                    port[Id].isbooked = true;
+                    ship[i].MoveToPort(Id);
                     ship[i].finishLoad = false;
-                    break;
                 }
-            }else{      // ship is simply loading
+            }
+            else { // ship is simply loading
                 // do nothing
             }
-        }else if(ship[i].status == MOVING){
-            // do nothing
-        }else if(ship[i].status == WAITING){
+        }
+        else if (ship[i].status == MOVING) {
+            // TODO maybe do nothing
+        }
+        else if (ship[i].status == WAITING) {
             // TODO
         }
     }
 }
+
+
 
 /*****************************not use in this project****************************/
 void Controller::RobotUnavailableSearchNewPath() {
