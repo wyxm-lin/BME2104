@@ -309,11 +309,20 @@ void Controller::ShipSchedule(){
     }
     // TODO without considering the distance between the ship and the port
     // TODO last some frames, shut down 5 ports
+    {
+        if (NowFrame == 13500) {
+            for (int i = 5; i < PortNumber; i ++) {
+                port[i].close();
+            }
+        }
+    }
     priority_queue <Port> heap;
     for (int i = 0; i < PortNumber; i++) {
         if (port[i].isbooked) { // NOTE thick twice, observe the Time ship from Virtual point to port
             continue;
         }
+        if (port[i].isopen() == false)
+            continue;
         heap.push(port[i]);
     }
     for (int i = 0; i < ShipNumber; i++) {
@@ -325,6 +334,7 @@ void Controller::ShipSchedule(){
                 ship[i].afterSell = false;
                 if (!heap.empty()) {
                     int Id = heap.top().id;
+                    heap.pop(); // add this line
                     port[Id].isbooked = true;
                     ship[i].MoveToPort(Id);
                 }
@@ -335,11 +345,24 @@ void Controller::ShipSchedule(){
             }
             else if (ship[i].finishLoad) { // ship is not full, but the port now is empty
                 port[ship[i].target].isbooked = false;
-                if (!heap.empty()) {
-                    int Id = heap.top().id;
-                    port[Id].isbooked = true;
-                    ship[i].MoveToPort(Id);
-                    ship[i].finishLoad = false;
+                // if (!heap.empty()) {
+                //     int Id = heap.top().id;
+                //     heap.pop();
+                //     port[Id].isbooked = true;
+                //     ship[i].MoveToPort(Id);
+                //     ship[i].finishLoad = false;
+                // }
+                if (ship[i].HaveLoad < ship[i].capacity / 2) {
+                    if (!heap.empty()) {
+                        int Id = heap.top().id;
+                        heap.pop();
+                        port[Id].isbooked = true;
+                        ship[i].MoveToPort(Id);
+                        ship[i].finishLoad = false;
+                    }
+                }
+                else {
+                    ship[i].Sell();
                 }
             }
             else { // ship is simply loading
