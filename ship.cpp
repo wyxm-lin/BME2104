@@ -16,6 +16,6 @@ void Ship::Sell() {
     afterSell = true;
     shipFull = false;
     finishLoad = false;
-    HaveLoad = 0;
+    // HaveLoad = 0;
     target = -1;
 }

@@ -8,15 +8,26 @@ using std::queue;
 using std::vector;
 using std::sort;
 
+extern double AllItemAveValue;
+extern int AllItemValue;
+extern int AllItemNum;
+
 /**
  * @brief go over all the items, calc the value of all orders, val = itemvalue / dis
 */
 void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize], Atlas &atlas, int NowFrame) {
     vector <Order> ords[RobotNumber]; 
+    if (AllItemNum == 0) {
+        return;
+    }
+    AllItemAveValue = ((double)AllItemValue) / AllItemNum;
     while (Q.size()) {
         Item it = Q.front(); Q.pop();
         if (it != ItemMap[it.x][it.y]) { // this item has been taken, just kick out
             continue; // NOTE: what does it mean?
+        }
+        if (it.value < AllItemAveValue) { // NOTE
+            continue;
         }
         if (ItemMap[it.x][it.y].isbooked()) 
         {
@@ -35,7 +46,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
                 continue;
             }
             Order ord;
-            ord.DisItemToPort = port[aimport].GetDis(it.x, it.y);
+            ord.DisItemToPort = port[aimport].GetDis(it.x, it.y); // exact distance from item to port
             if(robot[i].oldPort == -1){     // the first order or order when the last item disapear
                 ord.DisRobotToItem = 400; // get a high value to make sure the robot will take the order
             }else{  // other orders

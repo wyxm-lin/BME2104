@@ -16,6 +16,9 @@
 #include <unordered_set>
 #include <bitset>
 #include <unordered_map>
+#include <cmath>
+#include <set>
+
 
 const int RobotNumber = 10; // the number of robot
 const int ShipNumber = 5; // the number of ship
@@ -31,6 +34,7 @@ const int TotalFrame = 15000;
 const double EPSILON = 1.0;
 const int FrameGoLess5Port = 11000;
 const int FrameGoMore5Port = 13000;
+
 
 enum MapStatus {
     EMPTY = 0, // empty areas
