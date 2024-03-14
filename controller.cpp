@@ -21,6 +21,8 @@ multiset<int>AllValue[205];
 double AllItemAveValue = 0;
 int AllItemValue = 0;
 int AllItemNum = 0;
+vector <pair<int, int>> robotPathSize[RobotNumber];
+vector <int> robotItemValue[RobotNumber];
 
 void Controller::Init() {
     for(int i = 0, robotid = -1; i < MapSize; i++) {
@@ -183,6 +185,19 @@ void Controller::RunByFrame() {
                 out << endl;
                 out.close();
             }
+            {
+                fstream fout;
+                fout.open("robotPath.txt", std::ios::app);
+                for (int i = 0; i < RobotNumber; i++) {
+                    fout << "robot " << i << " path size is " << robotPathSize[i].size() << endl;
+                    for (int j = 0; j < robotPathSize[i].size(); j++) {
+                        fout << robotPathSize[i][j].first << "\t" << robotPathSize[i][j].second << "\t";
+                        fout << robotItemValue[i][j] << endl;
+                    }
+                    fout << endl;
+                }
+                fout.close();
+            }
         }
 
         printf("OK\n");
@@ -264,6 +279,7 @@ void Controller::RobotGet() {
             int aimport = robot[i].targetport; // task switch
             robot[i].get(port[aimport].x, port[aimport].y);
             AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search path because task switch
+            robotPathSize[i][robotPathSize[i].size() - 1].second = robot[i].pathWithTime.size();
         }
     } 
 }
