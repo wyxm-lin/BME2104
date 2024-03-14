@@ -155,11 +155,7 @@ void Controller::RunByFrame() {
         }
         
         AutoShipLoad();
-        if (NowFrame < FrameGoLess5Port) {
-            ShipSchedule();
-        } else{
-            ShipSchedule();
-        }
+        ShipSchedule();
         
         if (NowFrame == 15000) {
             {
