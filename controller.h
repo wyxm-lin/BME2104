@@ -62,8 +62,21 @@ public:
     void RobotRealPull();
     void RobotRealGet();
 
+    /**
+     * @brief Maintain port items and ship items and such things
+     */
     void AutoShipLoad();
+
+    /**
+     * @brief Operate ship movements
+     */
     void ShipSchedule();
+
+    /**
+     * @brief Operate ship movements in last frames. 
+     * Go to the LOWER 5 ports at FrameLess5Ports, then go to the UPPER 5 ports at FrameMoer5Ports
+     */
+    void ShipScheduleLast();
 
     /**********************not use in this project********************************/
     void RobotUnavailableSearchNewPath();

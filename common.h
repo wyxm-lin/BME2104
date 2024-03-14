@@ -29,6 +29,8 @@ const int INF = 0x3f3f3f3f;
 const int CONSTDELTA = 500; // FIXME
 const int TotalFrame = 15000;
 const double EPSILON = 1.0;
+const int FrameGoLess5Port = 11000;
+const int FrameGoMore5Port = 13000;
 
 enum MapStatus {
     EMPTY = 0, // empty areas

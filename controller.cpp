@@ -122,7 +122,12 @@ void Controller::RunByFrame() {
         // }
 
         AutoShipLoad();
-        ShipSchedule();
+        if(NowFrame < FrameGoLess5Port){
+            ShipSchedule();
+        }else{
+            ShipSchedule();
+        }
+        
 
         printf("OK\n");
         fflush(stdout);
@@ -309,13 +314,13 @@ void Controller::ShipSchedule(){
     }
     // TODO without considering the distance between the ship and the port
     // TODO last some frames, shut down 5 ports
-    {
-        if (NowFrame == 13500) {
-            for (int i = 5; i < PortNumber; i ++) {
-                port[i].close();
-            }
-        }
-    }
+    // {
+    //     if (NowFrame == 13500) {
+    //         for (int i = 5; i < PortNumber; i ++) {
+    //             port[i].close();
+    //         }
+    //     }
+    // }
     priority_queue <Port> heap;
     for (int i = 0; i < PortNumber; i++) {
         if (port[i].isbooked) { // NOTE thick twice, observe the Time ship from Virtual point to port
@@ -352,7 +357,7 @@ void Controller::ShipSchedule(){
                 //     ship[i].MoveToPort(Id);
                 //     ship[i].finishLoad = false;
                 // }
-                if (ship[i].HaveLoad < ship[i].capacity / 2) {
+                if (ship[i].HaveLoad < ship[i].capacity / 2) {  // FIXME: adjust parameter
                     if (!heap.empty()) {
                         int Id = heap.top().id;
                         heap.pop();
@@ -376,6 +381,12 @@ void Controller::ShipSchedule(){
             // TODO
         }
     }
+}
+
+// TODO: not be called now
+void ShipScheduleLast(){
+    priority_queue <Port> heap;
+    
 }
 
 
