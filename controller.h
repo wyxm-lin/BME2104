@@ -72,6 +72,8 @@ public:
      */
     void ShipSchedule();
 
+    void ShipScheduleNew();
+
     /**
      * @brief Operate ship movements in last frames. 
      * Go to the LOWER 5 ports at FrameLess5Ports, then go to the UPPER 5 ports at FrameMoer5Ports
