@@ -5,6 +5,10 @@ using std::fstream;
 using std::ios;
 using std::endl;
 
+void GenerateShipOrdersNew(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame){
+    
+}
+
 void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame){
     // TODO without considering the distance between the ship and the port
     // TODO last some frames, shut down 5 ports

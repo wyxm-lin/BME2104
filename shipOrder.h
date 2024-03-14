@@ -17,6 +17,8 @@ struct ShipOrder {
     ShipOrder(): port(), shipId(-1), portId(-1), val(0.0) {}
 }; 
 
+void GenerateShipOrdersNew(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
+
 void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
 
 

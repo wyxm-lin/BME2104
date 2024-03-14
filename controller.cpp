@@ -23,6 +23,7 @@ int AllItemValue = 0;
 int AllItemNum = 0;
 vector <pair<int, int>> robotPathSize[RobotNumber];
 vector <int> robotItemValue[RobotNumber];
+vector <pair<int, int>> shipPathSize[ShipNumber];
 
 void Controller::Init() {
     for(int i = 0, robotid = -1; i < MapSize; i++) {
@@ -193,6 +194,19 @@ void Controller::RunByFrame() {
                     for (int j = 0; j < robotPathSize[i].size(); j++) {
                         fout << robotPathSize[i][j].first << "\t" << robotPathSize[i][j].second << "\t";
                         fout << robotItemValue[i][j] << endl;
+                    }
+                    fout << endl;
+                }
+                fout.close();
+            }
+            {
+                fstream fout;
+                fout.open("shipPath.txt", std::ios::app);
+                for (int i = 0; i < ShipNumber; i++) {
+                    fout << "ship " << i << " path" << endl;
+                    for (int j = 0; j < shipPathSize[i].size(); j++) {
+                        if(shipPathSize[i][j].second == -1) break;
+                        fout << shipPathSize[i][j].first << "\t" << shipPathSize[i][j].second << endl;
                     }
                     fout << endl;
                 }
