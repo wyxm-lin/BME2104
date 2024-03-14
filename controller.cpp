@@ -551,7 +551,7 @@ void Controller::ShipScheduleNew(){
         }
         return;
     }
-    GenerateShipOrders(port, ship, NowFrame);
+    GenerateShipOrdersNew(port, ship, NowFrame);
 
     ShipMoveOrSell();
 }

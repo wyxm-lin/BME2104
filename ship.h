@@ -2,12 +2,16 @@
 #define _SHIP_H_
 
 #include "common.h"
+#include "port.h"
+
+class ShipOrder;
 
 class Ship {
 public:
     int id, capacity, target;
     int aimPort;
     ShipStatus status;
+    Port port;
 
     int NotMoveMoment;
     int HaveLoad;

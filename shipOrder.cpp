@@ -6,7 +6,76 @@ using std::ios;
 using std::endl;
 
 void GenerateShipOrdersNew(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame){
-    
+    priority_queue <ShipOrder> shipOrder;
+    for(int i = 0; i < PortNumber; i++){
+        if(port[i].isopen() == false) continue;
+        if(port[i].isbooked) continue;
+        double val = (double)port[i].nowItemCnt;    // TODO
+        shipOrder.push(ShipOrder(port[i], -1, i, val));
+    }
+
+    for (int i = 0; i < ShipNumber; i++) {
+        if (ship[i].status == SHIPPING) {
+            if (ship[i].afterMove) { // ship just arrive at a new port
+                ship[i].afterMove = false;
+            }
+            else if (ship[i].afterSell) { // ship just arrive at the virtual point
+                ship[i].HaveLoad = 0; // NOTE
+                ship[i].aimPort = -1; // detect where no port to go
+                while (!shipOrder.empty()) {
+                    int Id = shipOrder.top().portId;
+                    if(port[Id].isbooked){  // maybe changed by other ships in the same frame
+                        shipOrder.pop(); 
+                        continue;
+                    }
+                    if (port[Id].T * 2 + NowFrame >= TotalFrame) { // add this line
+                        shipOrder.pop();
+                        continue;
+                    }
+                    shipOrder.pop(); 
+                    // ship[i].afterSell = false;
+                    port[Id].isbooked = true;
+                    ship[i].aimPort = Id;
+                    ship[i].port = port[Id];
+                    break;
+                }
+            }
+            else if (ship[i].shipFull) { // ship is full, go to sell 
+                port[ship[i].target].isbooked = false;
+            }
+            else if (ship[i].finishLoad) { // ship is not full, but the port now is empty
+                port[ship[i].target].isbooked = false;
+                ship[i].aimPort = -1;
+                while (!shipOrder.empty()) {
+                    int Id = shipOrder.top().portId;
+                    if(port[Id].isbooked){  // maybe changed by other ships in the same frame
+                        shipOrder.pop(); 
+                        continue;
+                    }
+                    // if(Id == ship[i].target){    // won't happen and will cause bug
+                    //     shipOrder.pop(); 
+                    //     continue;
+                    // }
+                    shipOrder.pop();
+                    port[Id].isbooked = true;
+                    ship[i].aimPort = Id;
+                    ship[i].finishLoad = false;
+                    ship[i].port = port[Id];
+                    break;
+                }
+                
+            }
+            else { // ship is simply loading
+                
+            }
+        }
+        else if (ship[i].status == MOVING) {
+            // TODO maybe do nothing
+        }
+        else if (ship[i].status == WAITING) {
+            // TODO
+        }
+    }
 }
 
 void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame){
