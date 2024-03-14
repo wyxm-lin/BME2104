@@ -155,7 +155,8 @@ void Controller::RunByFrame() {
         }
         
         AutoShipLoad();
-        ShipSchedule();
+        // ShipSchedule();
+        ShipScheduleNew();
         
         if (NowFrame == 15000) {
             {
@@ -463,7 +464,7 @@ void Controller::ShipSchedule(){
                     ship[i].Sell();
                 }
                 else {
-                    if (ship[i].HaveLoad < ship[i].capacity / 2) {  // FIXME adjust parameter
+                    // if (ship[i].HaveLoad < ship[i].capacity / 2) {  // FIXME adjust parameter
                         bool flag = false;
                         if (!heap.empty()) {
                             int Id = heap.top().id;
@@ -479,10 +480,10 @@ void Controller::ShipSchedule(){
                         if (!flag) {
                             ship[i].Sell();
                         }
-                    }
-                    else {
-                        ship[i].Sell();
-                    }
+                    // }
+                    // else {
+                    //     ship[i].Sell();
+                    // }
                 }
                 
             }
@@ -512,8 +513,55 @@ void Controller::ShipSchedule(){
 }
 
 // TODO not be called now
-void ShipScheduleLast(){
-    priority_queue <Port> heap;
+void Controller::ShipScheduleNew(){
+    if (NowFrame == 1) {
+        for (int i = 0; i < ShipNumber; i++) {
+            ship[i].aimPort = i;
+            port[i].isbooked = true;
+        }
+        return;
+    }
+    GenerateShipOrders(port, ship, NowFrame);
+
+    ShipMoveOrSell();
+}
+
+void Controller::ShipMoveOrSell(){
+    for(int i = 0; i < ShipNumber; i++){
+        if(ship[i].status == SHIPPING){
+            if(ship[i].shipFull){
+                ship[i].Sell();
+                continue;
+            }
+            if(ship[i].afterSell){  // start at the virtual point
+                ship[i].afterSell = false;
+                if(ship[i].aimPort == -1){  // no port to go, mainly because it's the last frames
+                    continue;
+                }
+                ship[i].MoveToPort(ship[i].aimPort);
+            } else {    // start at a ship[i].target port
+                if(ship[i].aimPort == -1){  // no port to go, don't think it will happen
+                    ship[i].Sell();
+                    continue;
+                }
+                if(port[ship[i].target].T + NowFrame >= TotalFrame){    // last frames
+                    ship[i].Sell();
+                    continue;
+                }
+                if(ship[i].aimPort != ship[i].target){  // need to move to another port
+                    if(port[ship[i].aimPort].T + 500 + NowFrame >= TotalFrame){
+                        ship[i].Sell();
+                    }else{
+                        ship[i].MoveToPort(ship[i].aimPort);
+                    }
+                }
+            }
+        }else if(ship[i].status == MOVING){
+            // do nothing
+        }else if(ship[i].status == WAITING){
+            // do nothing
+        }
+    }
     
 }
 
