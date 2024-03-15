@@ -98,7 +98,7 @@ void Robot::pull() {
     oldPort = targetport;
     targetX = targetY = targetport = -1; // invalid
     for (int i = pathIndex; i < pathWithTime.size(); i++) { // erase unused position
-        OccupiedNodeSet.erase(pathWithTime[i]);
+        OccupiedNodeSet.erase(pathWithTime[i]); // TODO modify the OccupiedNodeSet
     }
     pathWithTime.clear(); // clear the path
     pathIndex = -1; // set invalid

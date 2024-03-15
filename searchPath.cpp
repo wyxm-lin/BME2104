@@ -252,7 +252,7 @@ void AstarTimeEpsilonWithConflict(Robot &robot, double epsilon, Robot (&otherRob
             if (reachable(atlas[nextX][nextY], atlas[x][y]) == false) {
                 continue;
             }
-            if (vis[nextX][nextY]) { // has visited
+            if (vis[nextX][nextY]) { // two dimension has visited
                 continue;
             }
             NodeWithTime use4Search = NodeWithTime(nextX, nextY, NextTime, now.g + 1, epsilon * (abs(nextX - targetX) + abs(nextY - targetY) + abs(NextTime - NowFrame)));
@@ -265,7 +265,7 @@ void AstarTimeEpsilonWithConflict(Robot &robot, double epsilon, Robot (&otherRob
                 if (other == NowRobotId) {
                     continue;
                 }
-                if (otherRobot[other].OccupiedNodeSet.empty()) {
+                if (otherRobot[other].OccupiedNodeSet.empty()) { // TODO bitset
                     continue;
                 }
                 unordered_set<NodeWithTime>& otherRobotNodeWithTimeSet = otherRobot[other].OccupiedNodeSet;
@@ -287,7 +287,7 @@ void AstarTimeEpsilonWithConflict(Robot &robot, double epsilon, Robot (&otherRob
         }
     }
     if (Last.x == targetX && Last.y == targetY) {
-        vector<NodeWithTime> pathWithTime; // pathWithTime is (start, targe]
+        vector<NodeWithTime> pathWithTime; // pathWithTime is (start, target]
         while (Last != start) {
             pathWithTime.push_back(Last);
             Last = fa[Last];

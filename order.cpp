@@ -12,8 +12,8 @@ extern double AllItemAveValue;
 extern int AllItemValue;
 extern int AllItemNum;
 
-extern vector <pair<int, int>> robotPathSize[RobotNumber];
-extern vector <int> robotItemValue[RobotNumber];
+extern vector <pair <pair<int, int>, int> > robotPathSize[RobotNumber];
+extern vector <pair<int, int> > robotItemValue[RobotNumber];
 
 extern int atlas[MapSize][MapSize];
 extern int color[MapSize][MapSize];
@@ -85,16 +85,22 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
             AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot);
-            robotPathSize[i].push_back(std::make_pair(robot[i].pathWithTime.size(), i));
-            robotItemValue[i].push_back(ord.it.value);
+#ifdef DEBUG
+            robotPathSize[i].push_back({{robot[i].pathWithTime.size(), i}, NowFrame});
+            robotItemValue[i].push_back({ord.it.value, ord.it.destination});
+#endif
             break;
         }
     }
 }
 
+// choose a port for the item
 static int ItemChoosePort(Item& it, Port (&port)[PortNumber]) {
     int aimport = -1, minDis = INF;
     for (int i = 0; i < PortNumber; i++) {
+        if (port[i].isopen() == false) {
+            continue;
+        }
         int dis = PortGetDis(it.x, it.y, i);
         if (dis != -1 && dis < minDis) {
             minDis = dis;
@@ -107,12 +113,12 @@ static int ItemChoosePort(Item& it, Port (&port)[PortNumber]) {
     return aimport;
 }
 
-void GenerateOrders(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize], int NowFrame) {
+void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize], int NowFrame) {
     if (AllItemNum == 0) {
         return;
     }
     vector <Order> ords[RobotNumber];
-    AllItemAveValue = ((double)AllItemValue) / AllItemNum;
+    AllItemAveValue = ((double)AllItemValue) / AllItemNum; // calculate the average value of all items
     for (int id = 0; id < RobotNumber; id++) {
         RobotDisUpdate(robot[id].nowx, robot[id].nowy, id);
     }
@@ -129,8 +135,8 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Port 
         {
             continue;
         }
-        int aimport = ItemChoosePort(ItemMap[x][y], port);
-        if (aimport == -1) {
+        int aimport = ItemChoosePort(ItemMap[x][y], port); // choose the port: now just choose the nearest port
+        if (aimport == -1) { // no port can be chosen
             continue;
         }
         for (int i = 0; i < RobotNumber; i++) {
@@ -154,7 +160,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Port 
             }
             ord.PortId = aimport;
             ord.RobotId = i;
-            ord.val = (double)ItemMap[x][y].value / (ord.DisItemToPort + ord.DisRobotToItem);
+            ord.val = (double)ItemMap[x][y].value / (ord.DisItemToPort + ord.DisRobotToItem); // TODO how to define the value of the order
             ord.it = ItemMap[x][y];
             ords[i].push_back(ord);
         }
@@ -168,23 +174,30 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Port 
         for(auto ord: ords[i]) {
             int px = ord.it.x;
             int py = ord.it.y;
-            if(ItemMap[px][py].isbooked()) {
+            if (ItemMap[px][py].isbooked()) {
                 continue;
             }
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
             AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot);
-            robotPathSize[i].push_back(std::make_pair(robot[i].pathWithTime.size(), i));
-            robotItemValue[i].push_back(ord.it.value);
+#ifdef DEBUG
+            robotPathSize[i].push_back({{robot[i].pathWithTime.size(), i}, NowFrame});
+            robotItemValue[i].push_back({ord.it.value, ord.it.destination});
+#endif
             break;
         }
     }
 }
 
-void tryRetakeOrder(Robot &robot){
+void tryRetakeOrder(Robot &robot) {
+    // if the robot is carry
+    if (robot.IsCarry == true) { // TODO how to define the robot is carry
+        return;
+    }
     int remainDis = robot.pathWithTime.size() - robot.pathIndex;
     Item it = robot.carryItem;
-    if(remainDis + robot.NowFrame + 20 >= it.BirthFrame + ExistFrame) {  // set a threshold to make sure the robot won't take the disappeared item
+    // TODO 20?
+    if (remainDis + robot.NowFrame + 20 >= it.BirthFrame + ExistFrame) {  // set a threshold to make sure the robot won't take the disappeared item
         robot.carryItem = EmptyItem;
         robot.IsCarry = false;
         robot.IsWorking = false;
@@ -196,6 +209,5 @@ void tryRetakeOrder(Robot &robot){
         robot.pathWithTime.clear();
         robot.pathIndex = -1;
         return;
-        
     }
 }

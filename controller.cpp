@@ -14,22 +14,23 @@ using std::unordered_set;
 using std::multiset;
 using std::vector;
 
-int MyTotalTransport = 0;
-int MyTotalVal = 0;
-
-// unordered_set<int>Allvalue[205];
-multiset<int>AllValue[205];
-double AllItemAveValue = 0;
 int AllItemValue = 0;
 int AllItemNum = 0;
+double AllItemAveValue = 0;
 
-/*below are used for debug*/
-vector <pair <pair<int, int>, int> > robotPathSize[RobotNumber];
-vector <pair<int, int> > robotItemValue[RobotNumber];
-vector <pair <pair<int, int>, int > > shipPathSize[ShipNumber];
-vector <int> portShutDown;
+#ifdef DEBUG
+    /*below are used for debug*/
+    int TotalPullCount = 0;
+    int TotalPullValue = 0;
 
-/*above are used for debug*/
+    multiset<int>AllValue[205];
+
+    vector <pair <pair<int, int>, int> > robotPathSize[RobotNumber];
+    vector <pair<int, int> > robotItemValue[RobotNumber];
+    vector <pair <pair<int, int>, int > > shipPathSize[ShipNumber];
+    vector <int> portShutDown;
+    /*above are used for debug*/
+#endif
 
 extern MapStatus atlas[MapSize][MapSize];
 
@@ -72,7 +73,7 @@ void Controller::Init() {
         port[id].y = y;
         port[id].T = T;
         port[id].velocity = v;
-        RobotStopFrame = max(RobotStopFrame, TotalFrame - T);
+        RobotStopFrame = max(RobotStopFrame, TotalFrame - T); // NOTE
     }
     // port information finished
 
@@ -95,7 +96,7 @@ void Controller::Init() {
 
 void Controller::PreProcess() {
     ColorAtlas();
-    DegreeInit();
+    // DegreeInit();
     for (int id = 0; id <PortNumber; id ++) {
         PortDisInit(port[id].x, port[id].y, id);
     }
@@ -118,6 +119,7 @@ void Controller::RunByFrame() {
             int status, tarid;
             cin >> status >> tarid;
             ship[i].update((ShipStatus)status, tarid);
+            ship[i].NowFrame = NowFrame;
             // the status is accordingly assigned to integers, in 'common.h'
         }
         // Ship Data Update
@@ -129,7 +131,7 @@ void Controller::RunByFrame() {
             {
                 // origin version
                 RobotPull();
-                GenerateOrders(robot, ItemPosList, port, ItemMap, NowFrame);
+                GenerateOrdersNew(robot, ItemPosList, port, ItemMap, NowFrame);
                 RobotGet();
                 // avoidCollison(robot, atlas); // NOTE this function 
                 RobotMove();
@@ -138,7 +140,7 @@ void Controller::RunByFrame() {
             // {
             //     // new version (but the score almost less than origin version, need to think about it)
             //     RobotRealPull(); // when the robot real get the pos, switch state
-            //     GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
+            //     GenerateOrdersNew(robot, ItemPosList, port, ItemMap, NowFrame);
             //     RobotRealGet(); // when the robot real get the pos, switch state
             //     // avoidCollison(robot, atlas); // NOTE this function 
             //     RobotMove();
@@ -163,14 +165,17 @@ void Controller::ItemUpdateByFrame() {
     int NewItemCount;
     cin >> NewItemCount;
 
+#ifdef DEBUG
     fstream out;
     out.open("log.txt", std::ios::app);
     out << "NowFrame is " << NowFrame << " NewItemCount is " << NewItemCount << endl;
-    
+#endif
     for(int i = 1; i <= NewItemCount; i++) {
         int x, y, val;
         cin >> x >> y >> val;
+#ifdef DEBUG
         out << "x is " << x << " y is " << y << " val is " << val << endl;
+#endif
         for (int j = 0; j < PortNumber; j ++) {
             if (port[j].isopen() == false) {
                 continue;
@@ -179,27 +184,16 @@ void Controller::ItemUpdateByFrame() {
             if (disj != -1) {
                 ItemPosList.push({x, y});
                 ItemMap[x][y] = Item(NowFrame, x, y, val);
-                AllItemValue += val;
-                AllItemNum ++;
+                AllItemValue += val; // maintain this variable
+                AllItemNum ++; // maintain this variable
                 break;
             }
         }
-        // int aimid = -1, nowadis = INF;
-        // for(int j = 0; j < PortNumber; j++) { // search for the nearest port
-        //     if (port[j].isopen() == false) continue; // NOTE this port is closed
-        //     int disj = PortGetDis(x, y, j); // get the distance to the port j (this is color)
-        //     if(disj == -1) continue; // unreachable
-        //     if(disj < nowadis) nowadis = disj , aimid = j;
-        // }
-        // if(aimid == -1) continue;
-        // AllItemValue += val;
-        // AllItemNum ++;
-        // ItemList.emplace(Item(NowFrame, x, y, val, aimid));
-        // ItemMap[x][y] = Item(NowFrame, x, y, val, aimid);
     }
     // Finish new item input
-
+#ifdef DEBUG
     out.close();
+#endif
 }
 
 void Controller::ItemTimeOutDisappear() {
@@ -213,16 +207,6 @@ void Controller::ItemTimeOutDisappear() {
             break;
         }
     }
-    // while(ItemList.size()) {
-    //     Item it = ItemList.front();
-    //     if(it.BirthFrame + ExistFrame <= NowFrame) {
-    //         ItemMap[it.x][it.y] = EmptyItem;
-    //         ItemList.pop();
-    //     }
-    //     else {
-    //         break;
-    //     }
-    // }
 }
 
 void Controller::RobotPull() {
@@ -234,10 +218,12 @@ void Controller::RobotPull() {
         if (port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
             port[aimport].pull(robot[i].carryItem.value);
             robot[i].pull();
-            MyTotalTransport ++;
-            MyTotalVal += robot[i].carryItem.value;
+#ifdef DEBUG
+            TotalPullCount ++; // maintain this variable
+            TotalPullValue += robot[i].carryItem.value; // maintain this variable
             int Value = robot[i].carryItem.value;
-            AllValue[Value].insert(NowFrame);
+            AllValue[Value].insert(NowFrame); // maintain this variable
+#endif
         }
     }
 }
@@ -252,7 +238,9 @@ void Controller::RobotGet() {
             int aimport = robot[i].targetport; // task switch
             robot[i].get(port[aimport].x, port[aimport].y);
             AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search path because task switch
+#ifdef DEBUG
             robotPathSize[i][robotPathSize[i].size() - 1].first.second = robot[i].pathWithTime.size();
+#endif
         }
     } 
 }
@@ -306,7 +294,7 @@ void Controller::RobotMove() {
         if (robot[i].IsAvailable == false) {
             if (robot[i].UnavailableMoment == 0) {
                 robot[i].UnavailableMoment = NowFrame;
-                AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search new path because this robot is unavailable
+                AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search new path because this robot is unavailable // TODO 
             }
             else if (robot[i].UnavailableMoment + 20 <= robot[i].NowFrame) { // new crash occured
                 robot[i].UnavailableMoment += 10; // FIXME estimate after 10 frames, a new crash occured
@@ -328,109 +316,104 @@ void Controller::RobotMove() {
     }
 }
 
-void Controller::AutoShipLoad(){
-    for(int i = 0; i < ShipNumber; i++){
-        if(ship[i].status == SHIPPING){
-            if(ship[i].afterSell){  // at the virtual point
+void Controller::AutoShipLoad() {
+    for (int i = 0; i < ShipNumber; i++) {
+        if (ship[i].status == SHIPPING) {
+            if (ship[i].afterSell) {  // at the virtual point
                 continue;
             }
             int portId = ship[i].target;
             int v = port[portId].velocity;
             int actualLoadCnt;  // change if the ship is full or port is empty
-            if((ship[i].HaveLoad + v <= ship[i].capacity) && (port[portId].nowItemCnt - v > 0)){    // ship not full and port not empty
+            if ((ship[i].HaveLoad + v <= ship[i].capacity) && (port[portId].nowItemCnt - v > 0)) {    // ship not full and port not empty
                 ship[i].HaveLoad += v;
                 actualLoadCnt = v;
-            }else if ((ship[i].HaveLoad + v > ship[i].capacity) || (port[portId].nowItemCnt - v <= 0)){  // ship full or port empty
+            } 
+            else if ((ship[i].HaveLoad + v > ship[i].capacity) || (port[portId].nowItemCnt - v <= 0)){  // ship full or port empty
                 int shipRemain = ship[i].capacity - ship[i].HaveLoad;
                 int portRemain = port[portId].nowItemCnt;
-                if(shipRemain == portRemain){
+                if (shipRemain == portRemain) { // ship full & port empty
                     ship[i].HaveLoad = ship[i].capacity;
                     ship[i].shipFull = true;
                     ship[i].finishLoad = true;
                     actualLoadCnt = portRemain;
-                }else if(shipRemain < portRemain){    // ship can be full
+                }
+                else if (shipRemain < portRemain) { // ship full & port not empty
                     ship[i].HaveLoad = ship[i].capacity;
                     ship[i].shipFull = true;
                     actualLoadCnt = shipRemain;
-                }else{                                // port can be empty
+                }
+                else {                              // port empty & ship not full
                     ship[i].HaveLoad += portRemain;
                     actualLoadCnt = portRemain;
                     ship[i].finishLoad = true;
                 }
             }
             port[portId].load(actualLoadCnt); // modify the port's nowItemCnt
-            // MyTotalTransport += actualLoadCnt;
         }
     }
 }
 
-// TODO not be called now
-void Controller::ShipSchedule(){
-    if (NowFrame == 1) {
-        for (int i = 0; i < ShipNumber; i++) {
-            ship[i].aimPort = i;
-            port[i].isbooked = true;
-        }
-        return;
-    }
-    GenerateShipOrders(port, ship, NowFrame);
-
-    ShipMoveOrSell();
-}
-
-void Controller::ShipMoveOrSell(){
-    for(int i = 0; i < ShipNumber; i++){
-        if(ship[i].status == SHIPPING){
-            if(ship[i].shipFull){
+void Controller::ShipMoveOrSell() {
+    for (int i = 0; i < ShipNumber; i++) {
+        if (ship[i].status == SHIPPING) {
+            if (ship[i].shipFull) {
                 ship[i].Sell();
                 continue;
             }
-            if(ship[i].afterSell){  // start at the virtual point
+            if (ship[i].afterSell) {  // start at the virtual point
                 ship[i].afterSell = false;
-                if(ship[i].aimPort == -1){  // no port to go, mainly because it's the last frames
+                if (ship[i].aimPort == -1) {  // no port to go, mainly because it's the last frames
                     continue;
                 }
                 ship[i].MoveToPort(ship[i].aimPort);
-            } else {    // start at a ship[i].target port
-                if(ship[i].aimPort == -1){  // no port to go, don't think it will happen
+            } 
+            else {    // start at a ship[i].target port
+                if (ship[i].aimPort == -1) {  // no port to go, don't think it will happen
                     ship[i].Sell();
                     continue;
                 }
-                if(port[ship[i].target].T + NowFrame >= TotalFrame){    // last frames
+                if (port[ship[i].target].T + NowFrame >= TotalFrame) {    // last frames
                     ship[i].Sell();
                     continue;
                 }
-                if(ship[i].aimPort != ship[i].target){  // need to move to another port
-                    if(port[ship[i].aimPort].T + 500 + NowFrame >= TotalFrame){
+                if (ship[i].aimPort != ship[i].target) {  // need to move to another port
+                    if (port[ship[i].aimPort].T + 500 + NowFrame >= TotalFrame) {
                         ship[i].Sell();
-                    }else{
+                    }
+                    else{
                         ship[i].MoveToPort(ship[i].aimPort);
                     }
                 }
             }
-        }else if(ship[i].status == MOVING){
+        }
+        else if(ship[i].status == MOVING) {
             // do nothing
-        }else if(ship[i].status == WAITING){
+        }
+        else if(ship[i].status == WAITING) {
             // do nothing
         }
     }
-    
 }
 
-void Controller::ShipScheduleNew(){
+void Controller::ShipSchedule(){
     if (NowFrame == 1) {
+        // TODO maybe need to change the strategy
         for (int i = 0; i < ShipNumber; i++) {
             ship[i].aimPort = i;
             port[i].isbooked = true;
         }
         return;
     }
-    if(NowFrame == FrameLastTimeHandle){
+
+    if (NowFrame == FrameLastTimeHandle) { // TODO think twice
         HandleLastFrames(port, ship, NowFrame);
     }
 
+#ifdef DEBUG
     {
        if(NowFrame == FrameLastTimeHandle + 1){
+
             fstream out;
             out.open("port.txt", std::ios::app);
             for(int i = 0; i < PortNumber; i++){
@@ -440,11 +423,10 @@ void Controller::ShipScheduleNew(){
             out.close();
         }
     }
-    
+#endif
 
     GenerateShipOrders(port, ship, NowFrame);
     ShipMoveOrSell();
-
     return;
 }
 

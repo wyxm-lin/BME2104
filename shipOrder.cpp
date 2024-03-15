@@ -13,13 +13,13 @@ void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int 
     for(int i = 0; i < PortNumber; i++){
         if(port[i].isopen() == false) continue;
         if(port[i].isbooked) continue;
-        double val = (double)port[i].nowItemCnt;    // TODO
+        double val = (double)port[i].nowItemCnt;    // TODO maybe change to another way
         shipOrder.push(ShipOrder(port[i], -1, i, val));
     }
 
     for (int i = 0; i < ShipNumber; i++) {
         if (ship[i].status == SHIPPING) {
-            if(ship[i].portLastGo != -1){   // only occurs in the last frames
+            if (ship[i].portLastGo != -1) {   // only occurs in the last frames
                 ship[i].HaveLoad = 0; 
                 port[ship[i].portLastGo].isbooked = true;
                 ship[i].aimPort = ship[i].portLastGo;
@@ -58,7 +58,7 @@ void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int 
                 ship[i].aimPort = -1;
                 while (!shipOrder.empty()) {
                     int Id = shipOrder.top().portId;
-                    if(port[Id].isbooked){  // maybe changed by other ships in the same frame
+                    if(port[Id].isbooked) {  // maybe changed by other ships in the same frame
                         shipOrder.pop(); 
                         continue;
                     }
@@ -88,50 +88,62 @@ void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int 
     }
 }
 
-void HandleLastFrames(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame){
+void HandleLastFrames(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame) {
     // use to search for ports to be shut down
     auto cmp = [](Port a, Port b){
-        return a.totalItemCnt > b.totalItemCnt;
+        return a.totalItemCnt > b.totalItemCnt; // TODO maybe change to another way
     };
     priority_queue <Port, vector<Port>, decltype(cmp)> ports(cmp);
 
     // first push the targets port, avoid redundant close
-    for(int i = 0; i < ShipNumber; i++){
-        if(ship[i].status == SHIPPING || ship[i].status == MOVING){
-            if(ship[i].target != -1){
+    for (int i = 0; i < ShipNumber; i++) {
+        if (ship[i].status == SHIPPING || ship[i].status == MOVING) {
+            if (ship[i].target != -1) { // moving to a certain port || at a certain port
                 port[ship[i].target].close();
+#ifdef DEBUG
                 portShutDown.push_back(ship[i].target);
+#endif
             }
         }
     }
 
     for(int i = 0; i < PortNumber; i++){
-        if(port[i].isopen() == false) continue;
+        if (port[i].isopen() == false) {
+            continue;
+        }
         ports.push(port[i]);
     }
 
-    for(int i = 0; i < ShipNumber; i++){
+    for (int i = 0; i < ShipNumber; i++) {
         if(ship[i].status == WAITING){
             // TODO
-        }else if(ship[i].status == MOVING){
-            if(ship[i].target != -1){   // moving to a certain port, close this after loading
+        }
+        else if (ship[i].status == MOVING) {
+            if (ship[i].target != -1) {   // moving to a certain port, close this after loading
                 // port[ship[i].target].close();
                 // portShutDown.push_back(ship[i].target);
-            }else{      // moving to the virtual point, choose the last port to close
-                ship[i].portLastGo = ports.top().id;
-                ports.pop();
-                port[ship[i].portLastGo].close();
-                portShutDown.push_back(ship[i].portLastGo);
             }
-        }else if(ship[i].status == SHIPPING){
-            if(ship[i].target != -1){  // loading at a certain port, close this after loading
-                // port[ship[i].target].close();
-                // portShutDown.push_back(ship[i].target);
-            }else{      // be right at the virtual point, choose the last port to close
+            else {      // moving to the virtual point, choose the last port to close
                 ship[i].portLastGo = ports.top().id;
                 ports.pop();
                 port[ship[i].portLastGo].close();
+#ifdef DEBUG
                 portShutDown.push_back(ship[i].portLastGo);
+#endif
+            }
+        }
+        else if (ship[i].status == SHIPPING) {
+            if (ship[i].target != -1) {  // loading at a certain port, close this after loading
+                // port[ship[i].target].close();
+                // portShutDown.push_back(ship[i].target);
+            }
+            else {      // be right at the virtual point, choose the last port to close
+                ship[i].portLastGo = ports.top().id;
+                ports.pop();
+                port[ship[i].portLastGo].close();
+#ifdef DEBUG
+                portShutDown.push_back(ship[i].portLastGo);
+#endif
             }
         }
     }

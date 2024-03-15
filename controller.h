@@ -75,10 +75,9 @@ public:
     /**
      * @brief Operate ship movements
      */
+    void ShipMoveOrSell();
     void ShipSchedule();
 
-    void ShipScheduleNew();
-    void ShipMoveOrSell();
 
     /**********************not use in this project********************************/
     void RobotUnavailableSearchNewPath();
