@@ -76,9 +76,9 @@ public:
      */
     void ShipSchedule();
 
-    void ShipScheduleNew();
-
     void ShipMoveOrSell();
+
+    void ShipScheduleNew();
 
     /**********************not use in this project********************************/
     void RobotUnavailableSearchNewPath();

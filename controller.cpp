@@ -21,9 +21,14 @@ multiset<int>AllValue[205];
 double AllItemAveValue = 0;
 int AllItemValue = 0;
 int AllItemNum = 0;
+
+/*below are used for debug*/
 vector <pair<int, int>> robotPathSize[RobotNumber];
 vector <int> robotItemValue[RobotNumber];
 vector <pair<int, int>> shipPathSize[ShipNumber];
+vector <int> portShutDown;
+
+/*above are used for debug*/
 
 void Controller::Init() {
     for(int i = 0, robotid = -1; i < MapSize; i++) {
@@ -182,6 +187,11 @@ void Controller::RunByFrame() {
                     out << AllValue[i].size() << " ";
                     if ( i % 20 == 0)
                         out << endl;
+                }
+                out << endl;
+                out << "Port shut down: ";
+                for(auto it : portShutDown) {
+                    out << it << " ";
                 }
                 out << endl;
                 out.close();
@@ -408,150 +418,12 @@ void Controller::AutoShipLoad(){
 void Controller::ShipSchedule(){
     if (NowFrame == 1) {
         for (int i = 0; i < ShipNumber; i++) {
-            ship[i].MoveToPort(i);
-            port[i].isbooked = true;
-        }
-        return;
-    }
-    // TODO without considering the distance between the ship and the port
-    // TODO last some frames, shut down 5 ports
-    {
-        if (NowFrame == 13500) {
-            for (int i = 5; i < PortNumber; i ++) {
-                port[i].close();
-            }
-        }
-    }
-    priority_queue <Port> heap;
-    for (int i = 0; i < PortNumber; i++) {
-        if (port[i].isbooked) { // NOTE thick twice, observe the Time ship from Virtual point to port
-            continue;
-        }
-        if (port[i].isopen() == false)
-            continue;
-        heap.push(port[i]);
-    }
-
-    for (int i = 0; i < ShipNumber; i++) {
-        if (ship[i].status == SHIPPING) {
-            if (ship[i].afterMove) { // ship just arrive at a new port
-                {
-                    fstream out;
-                    out.open("log.txt", std::ios::app);
-                    out << "ship " << i << " arrive at " << ship[i].target << endl;
-                    out << port[ship[i].target].T << endl;
-                    out.close();
-                }
-                ship[i].afterMove = false;
-            }
-            else if (ship[i].afterSell) { // ship just arrive at the virtual point
-                {
-                    fstream out;
-                    out.open("log.txt", std::ios::app);
-                    out << "ship " << i << " arrive at virtual point" << endl;
-                    out.close();
-                }
-                ship[i].HaveLoad = 0; // NOTE
-                while (!heap.empty()) {
-                    int Id = heap.top().id;
-                    heap.pop(); // add this line
-                    if (port[Id].T * 2 + NowFrame >= TotalFrame) { // add this line
-                        continue;
-                    }
-                    ship[i].afterSell = false;
-                    port[Id].isbooked = true;
-                    ship[i].MoveToPort(Id);
-                    break;
-                }
-            }
-            else if (ship[i].shipFull) { // ship is full, go to sell
-                {
-                    fstream out;
-                    out.open("log.txt", std::ios::app);
-                    out << "ship " << i << " shipFull" << endl;
-                    out.close();
-                }
-                port[ship[i].target].isbooked = false;
-                ship[i].Sell();
-            }
-            else if (ship[i].finishLoad) { // ship is not full, but the port now is empty
-                {
-                    fstream out;
-                    out.open("log.txt", std::ios::app);
-                    out << "ship " << i << " finishLoad" << endl;
-                    out.close();
-                }
-                port[ship[i].target].isbooked = false;
-                {
-                    if (port[i].T + NowFrame == TotalFrame) {
-                        fstream out;
-                        out.open("log.txt", std::ios::app);
-                        out << "ship " << i << " sell at " << ship[i].target << endl;
-                        out.close();
-                    }
-                }
-                if (port[i].T + NowFrame == TotalFrame) {
-                    ship[i].Sell();
-                }
-                else {
-                    // if (ship[i].HaveLoad < ship[i].capacity / 2) {  // FIXME adjust parameter
-                        bool flag = false;
-                        if (!heap.empty()) {
-                            int Id = heap.top().id;
-                            heap.pop();
-                            if (port[Id].T + 500 + NowFrame >= TotalFrame) {
-                                continue;
-                            }
-                            port[Id].isbooked = true;
-                            ship[i].MoveToPort(Id);
-                            ship[i].finishLoad = false;
-                            flag = true;
-                        }
-                        if (!flag) {
-                            ship[i].Sell();
-                        }
-                    // }
-                    // else {
-                    //     ship[i].Sell();
-                    // }
-                }
-                
-            }
-            else { // ship is simply loading
-                if (ship[i].target != -1) {
-                    if (port[ship[i].target].T + NowFrame == TotalFrame - 1) { // NOTE
-                        ship[i].Sell();
-                        {
-                            fstream out;
-                            out.open("log.txt", std::ios::app);
-                            out << "ship " << i << " sell at " << ship[i].target << endl;
-                            out.close();
-                        
-                        }
-                    }
-                }
-                
-            }
-        }
-        else if (ship[i].status == MOVING) {
-            // TODO maybe do nothing
-        }
-        else if (ship[i].status == WAITING) {
-            // TODO
-        }
-    }
-}
-
-// TODO not be called now
-void Controller::ShipScheduleNew(){
-    if (NowFrame == 1) {
-        for (int i = 0; i < ShipNumber; i++) {
             ship[i].aimPort = i;
             port[i].isbooked = true;
         }
         return;
     }
-    GenerateShipOrdersNew(port, ship, NowFrame);
+    GenerateShipOrders(port, ship, NowFrame);
 
     ShipMoveOrSell();
 }
@@ -594,6 +466,25 @@ void Controller::ShipMoveOrSell(){
     }
     
 }
+
+void Controller::ShipScheduleNew(){
+    if (NowFrame == 1) {
+        for (int i = 0; i < ShipNumber; i++) {
+            ship[i].aimPort = i;
+            port[i].isbooked = true;
+        }
+        return;
+    }
+    if(NowFrame == FrameLastTimeHandle){
+        HandleLastFrames(port, ship, NowFrame);
+    }
+
+    GenerateShipOrders(port, ship, NowFrame);
+    ShipMoveOrSell();
+
+    return;
+}
+
 
 
 

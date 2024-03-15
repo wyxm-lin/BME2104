@@ -10,6 +10,7 @@ class Ship {
 public:
     int id, capacity, target;
     int aimPort;
+    int portLastGo = -1; // special for last frames, go to ports that has been shut down
     ShipStatus status;
     Port port;
 

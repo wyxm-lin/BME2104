@@ -32,6 +32,9 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
         if (it.value < AllItemAveValue) { // NOTE
             continue;
         }
+        if(!port[it.destination].isopen()) {
+                continue;
+        }
         if (ItemMap[it.x][it.y].isbooked()) 
         {
             continue;

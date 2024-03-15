@@ -23,9 +23,11 @@ struct ShipOrder {
     }
 }; 
 
-void GenerateShipOrdersNew(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
-
 void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
+
+void HandleLastFrames(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
+
+void GenerateShipOrdersOld(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
 
 
 #endif // SHIPORDER_H
