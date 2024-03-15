@@ -12,6 +12,7 @@ using std::fstream; // TODO remove this line
 using std::max;
 using std::unordered_set;
 using std::multiset;
+using std::vector;
 
 int MyTotalTransport = 0;
 int MyTotalVal = 0;
@@ -21,9 +22,14 @@ multiset<int>AllValue[205];
 double AllItemAveValue = 0;
 int AllItemValue = 0;
 int AllItemNum = 0;
-vector <pair<int, int>> robotPathSize[RobotNumber];
-vector <int> robotItemValue[RobotNumber];
-vector <pair<int, int>> shipPathSize[ShipNumber];
+
+/*below are used for debug*/
+vector <pair <pair<int, int>, int> > robotPathSize[RobotNumber];
+vector <pair<int, int> > robotItemValue[RobotNumber];
+vector <pair <pair<int, int>, int > > shipPathSize[ShipNumber];
+vector <int> portShutDown;
+
+/*above are used for debug*/
 
 extern MapStatus atlas[MapSize][MapSize];
 
@@ -246,7 +252,7 @@ void Controller::RobotGet() {
             int aimport = robot[i].targetport; // task switch
             robot[i].get(port[aimport].x, port[aimport].y);
             AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search path because task switch
-            robotPathSize[i][robotPathSize[i].size() - 1].second = robot[i].pathWithTime.size();
+            robotPathSize[i][robotPathSize[i].size() - 1].first.second = robot[i].pathWithTime.size();
         }
     } 
 }
@@ -367,7 +373,7 @@ void Controller::ShipSchedule(){
         }
         return;
     }
-    GenerateShipOrdersNew(port, ship, NowFrame);
+    GenerateShipOrders(port, ship, NowFrame);
 
     ShipMoveOrSell();
 }
@@ -409,6 +415,37 @@ void Controller::ShipMoveOrSell(){
         }
     }
     
+}
+
+void Controller::ShipScheduleNew(){
+    if (NowFrame == 1) {
+        for (int i = 0; i < ShipNumber; i++) {
+            ship[i].aimPort = i;
+            port[i].isbooked = true;
+        }
+        return;
+    }
+    if(NowFrame == FrameLastTimeHandle){
+        HandleLastFrames(port, ship, NowFrame);
+    }
+
+    {
+       if(NowFrame == FrameLastTimeHandle + 1){
+            fstream out;
+            out.open("port.txt", std::ios::app);
+            for(int i = 0; i < PortNumber; i++){
+                out << port[i].isopen() << " ";
+            }
+            out << endl;
+            out.close();
+        }
+    }
+    
+
+    GenerateShipOrders(port, ship, NowFrame);
+    ShipMoveOrSell();
+
+    return;
 }
 
 

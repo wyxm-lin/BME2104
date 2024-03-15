@@ -14,6 +14,9 @@ using std::unordered_map;
 extern MapStatus atlas[MapSize][MapSize];
 extern int color[MapSize][MapSize];
 
+extern vector <pair<pair<int, int>, int> > robotPathSize[RobotNumber];
+extern vector <pair<int, int>> robotItemValue[RobotNumber];
+
 void SearchPath(Robot &robot) {
     AstarTimeEpsilon(robot, 1.0); // FIXME epsilon value
 }

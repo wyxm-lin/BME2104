@@ -29,5 +29,4 @@ void HandleLastFrames(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int No
 
 void GenerateShipOrdersOld(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
 
-
 #endif // SHIPORDER_H

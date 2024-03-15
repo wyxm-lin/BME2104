@@ -77,6 +77,7 @@ public:
      */
     void ShipSchedule();
 
+    void ShipScheduleNew();
     void ShipMoveOrSell();
 
     /**********************not use in this project********************************/
