@@ -20,6 +20,7 @@ void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int 
     for (int i = 0; i < ShipNumber; i++) {
         if (ship[i].status == SHIPPING) {
             if(ship[i].portLastGo != -1){   // only occurs in the last frames
+                ship[i].HaveLoad = 0; 
                 port[ship[i].portLastGo].isbooked = true;
                 ship[i].aimPort = ship[i].portLastGo;
                 ship[i].port = port[ship[i].portLastGo];

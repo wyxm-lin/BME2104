@@ -14,6 +14,7 @@ public:
     ShipStatus status;
     Port port;
 
+    int NowFrame;
     int NotMoveMoment;
     int HaveLoad;
     bool finishLoad = false;  // finish load at a port, NOT means the ship is full 

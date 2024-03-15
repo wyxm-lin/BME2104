@@ -12,8 +12,8 @@ extern double AllItemAveValue;
 extern int AllItemValue;
 extern int AllItemNum;
 
-extern vector <pair<int, int>> robotPathSize[RobotNumber];
-extern vector <int> robotItemValue[RobotNumber];
+extern vector <pair<pair<int, int>, int> > robotPathSize[RobotNumber];
+extern vector <pair<int, int>> robotItemValue[RobotNumber];
 
 /**
  * @brief go over all the items, calc the value of all orders, val = itemvalue / dis
@@ -83,8 +83,8 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
             AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot);
-            robotPathSize[i].push_back(std::make_pair(robot[i].pathWithTime.size(), i));
-            robotItemValue[i].push_back(ord.it.value);
+            robotPathSize[i].push_back(std::make_pair(std::make_pair(robot[i].pathWithTime.size(), i), NowFrame));
+            robotItemValue[i].push_back(std::make_pair(ord.it.value, ord.it.destination));
             break;
         }
     }

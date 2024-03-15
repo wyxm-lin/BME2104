@@ -23,9 +23,9 @@ int AllItemValue = 0;
 int AllItemNum = 0;
 
 /*below are used for debug*/
-vector <pair<int, int>> robotPathSize[RobotNumber];
-vector <int> robotItemValue[RobotNumber];
-vector <pair<int, int>> shipPathSize[ShipNumber];
+vector <pair <pair<int, int>, int> > robotPathSize[RobotNumber];
+vector <pair<int, int> >robotItemValue[RobotNumber];
+vector <pair <pair<int, int>, int > > shipPathSize[ShipNumber];
 vector <int> portShutDown;
 
 /*above are used for debug*/
@@ -116,6 +116,7 @@ void Controller::RunByFrame() {
             int status, tarid;
             cin >> status >> tarid;
             ship[i].update((ShipStatus)status, tarid);
+            ship[i].NowFrame = NowFrame;
             // the status is accordingly assigned to integers, in 'common.h'
         }
         // Ship Data Update
@@ -202,8 +203,8 @@ void Controller::RunByFrame() {
                 for (int i = 0; i < RobotNumber; i++) {
                     fout << "robot " << i << " path size is " << robotPathSize[i].size() << endl;
                     for (int j = 0; j < robotPathSize[i].size(); j++) {
-                        fout << robotPathSize[i][j].first << "\t" << robotPathSize[i][j].second << "\t";
-                        fout << robotItemValue[i][j] << endl;
+                        fout << robotPathSize[i][j].second << "\t" << robotPathSize[i][j].first.first << "\t" << robotPathSize[i][j].first.second << "\t";
+                        fout << robotItemValue[i][j].first << "\t" << robotItemValue[i][j].second << endl;
                     }
                     fout << endl;
                 }
@@ -215,8 +216,8 @@ void Controller::RunByFrame() {
                 for (int i = 0; i < ShipNumber; i++) {
                     fout << "ship " << i << " path" << endl;
                     for (int j = 0; j < shipPathSize[i].size(); j++) {
-                        if(shipPathSize[i][j].second == -1) break;
-                        fout << shipPathSize[i][j].first << "\t" << shipPathSize[i][j].second << endl;
+                        if(shipPathSize[i][j].first.second == -1) break;
+                        fout << shipPathSize[i][j].first.first << "\t" << shipPathSize[i][j].first.second  << "\t" << shipPathSize[i][j].second << endl;
                     }
                     fout << endl;
                 }
@@ -303,7 +304,7 @@ void Controller::RobotGet() {
             int aimport = robot[i].targetport; // task switch
             robot[i].get(port[aimport].x, port[aimport].y);
             AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search path because task switch
-            robotPathSize[i][robotPathSize[i].size() - 1].second = robot[i].pathWithTime.size();
+            robotPathSize[i][robotPathSize[i].size() - 1].first.second = robot[i].pathWithTime.size();
         }
     } 
 }
@@ -478,6 +479,19 @@ void Controller::ShipScheduleNew(){
     if(NowFrame == FrameLastTimeHandle){
         HandleLastFrames(port, ship, NowFrame);
     }
+
+    {
+       if(NowFrame == FrameLastTimeHandle + 1){
+            fstream out;
+            out.open("port.txt", std::ios::app);
+            for(int i = 0; i < PortNumber; i++){
+                out << port[i].isopen() << " ";
+            }
+            out << endl;
+            out.close();
+        }
+    }
+    
 
     GenerateShipOrders(port, ship, NowFrame);
     ShipMoveOrSell();
