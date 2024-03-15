@@ -22,3 +22,4 @@
 4、搜索中设置5个方向
 5、tryretakeorder
 6、最后时刻的船的order可能要重新写
+7、waiting for lbn
