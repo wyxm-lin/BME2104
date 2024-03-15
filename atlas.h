@@ -5,24 +5,7 @@
 
 using std::string;
 
-class Atlas {
-public:
-    MapStatus atlas[MapSize][MapSize];
-    int color[MapSize][MapSize];
-    int ColorCount;
-    int degree[MapSize][MapSize];
-    void DegreeInit();
-
-    Atlas() = default;
-    ~Atlas() = default;
-    
-    void ColorAtlas();
-
-    /************Below variables and functions are for debug***************/
-    void AtlasInitByMapTxt(string path);
-    void AtlasPrintColor(int top, int left, int bottom, int right);
-    void AtlasPrintMap();
-    
-};
+void ColorAtlas();
+void DegreeInit();
 
 #endif

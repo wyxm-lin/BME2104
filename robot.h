@@ -55,4 +55,7 @@ public:
     void RobotPrintPath();
 };
 
+void RobotDisUpdate(int RobotX, int RobotY, int id);
+int RobotGetDis(int x, int y, int id);
+
 #endif

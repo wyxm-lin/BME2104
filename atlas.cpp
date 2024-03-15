@@ -4,7 +4,12 @@
 using std::queue;
 using std::pair;
 
-void Atlas::ColorAtlas() {
+MapStatus atlas[MapSize][MapSize];
+int color[MapSize][MapSize];
+int ColorCount;
+int degree[MapSize][MapSize];
+
+void ColorAtlas() {
     // WALL is invalid, other is valid
     for (int i = 0; i < MapSize; i++) {
         for (int j = 0; j < MapSize; j++) {
@@ -39,7 +44,7 @@ void Atlas::ColorAtlas() {
     }
 }
 
-void Atlas::DegreeInit() {
+void DegreeInit() {
     for (int i = 0; i < MapSize; i++) {
         for (int j = 0; j < MapSize; j++) {
             degree[i][j] = 0;
@@ -53,72 +58,5 @@ void Atlas::DegreeInit() {
                 }
             }
         }
-    }
-}
-
-/************Below variables and functions are for debug***************/
-void Atlas::AtlasInitByMapTxt(string path) {
-    using std::ifstream;
-    ifstream fin(path);
-    for (int i = 0; i < MapSize; i++) {
-        string line;
-        fin >> line;
-        for (int j = 0; j < MapSize; j++) {
-            switch (line[j]) {
-            case '.':
-                atlas[i][j] = EMPTY;
-                break;
-            case '*':
-                atlas[i][j] = WATER;
-                break;
-            case '#':
-                atlas[i][j] = WALL;
-                break;
-            case 'A':
-                atlas[i][j] = EMPTY;
-                break;
-            case 'B':
-                atlas[i][j] = PORT;
-                break;
-            default:
-                break;
-            }
-        }
-    }
-    fin.close();
-}
-
-void Atlas::AtlasPrintColor(int top, int left, int bottom, int right) {
-    for (int i = top; i <= bottom; i++) {
-        for (int j = left; j <= right; j++) {
-            if (color[i][j] == -1) {
-                printf("W   ");
-            } else {
-                printf("%-4d", color[i][j]);
-            }
-        }
-        printf("\n");
-    }
-}
-
-void Atlas::AtlasPrintMap() {
-    for (int i = 0; i < MapSize; i++) {
-        for (int j = 0; j < MapSize; j++) {
-            switch (atlas[i][j]) {
-            case EMPTY:
-                printf(". ");
-                break;
-            case WATER:
-                printf("* ");
-                break;
-            case WALL:
-                printf("# ");
-                break;
-            case PORT:
-                printf("A ");
-                break;
-            }
-        }
-        printf("\n");
     }
 }

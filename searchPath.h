@@ -5,7 +5,6 @@
 #include <bitset>
 using std::bitset;
 
-class Atlas;
 class Robot;
 
 struct NodeWithTime {
@@ -39,9 +38,9 @@ namespace std {
 }
 
 void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[RobotNumber]);
-void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas);
-void SearchPath(Robot &robot, Atlas& atlas);
-void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon);
-void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Robot (&otherRobot)[RobotNumber]);
+void avoidCollison(Robot (&robot)[RobotNumber]);
+void SearchPath(Robot &robot);
+void AstarTimeEpsilon(Robot &robot, double epsilon);
+void AstarTimeEpsilonWithConflict(Robot &robot, double epsilon, Robot (&otherRobot)[RobotNumber]);
 
 #endif

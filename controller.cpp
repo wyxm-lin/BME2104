@@ -21,14 +21,11 @@ multiset<int>AllValue[205];
 double AllItemAveValue = 0;
 int AllItemValue = 0;
 int AllItemNum = 0;
+vector <pair<int, int>> robotPathSize[RobotNumber];
+vector <int> robotItemValue[RobotNumber];
+vector <pair<int, int>> shipPathSize[ShipNumber];
 
-/*below are used for debug*/
-vector <pair <pair<int, int>, int> > robotPathSize[RobotNumber];
-vector <pair<int, int> >robotItemValue[RobotNumber];
-vector <pair <pair<int, int>, int > > shipPathSize[ShipNumber];
-vector <int> portShutDown;
-
-/*above are used for debug*/
+extern MapStatus atlas[MapSize][MapSize];
 
 void Controller::Init() {
     for(int i = 0, robotid = -1; i < MapSize; i++) {
@@ -37,22 +34,22 @@ void Controller::Init() {
         for(int j = 0; j < MapSize; j++) {
             switch (line[j]) {
             case '.':
-                atlas.atlas[i][j] = EMPTY;
+                atlas[i][j] = EMPTY;
                 break;
             case '*':
-                atlas.atlas[i][j] = WATER;
+                atlas[i][j] = WATER;
                 break;
             case '#':
-                atlas.atlas[i][j] = WALL;
+                atlas[i][j] = WALL;
                 break;
             case 'A':
-                atlas.atlas[i][j] = EMPTY;
+                atlas[i][j] = EMPTY;
                 ++robotid;
                 robot[robotid].id = robotid;
                 robot[robotid].update(i, j, false, true, 0);
                 break;
             case 'B':
-                atlas.atlas[i][j] = PORT;
+                atlas[i][j] = PORT;
                 break;
             default:
                 break;
@@ -91,19 +88,18 @@ void Controller::Init() {
 }
 
 void Controller::PreProcess() {
-    atlas.ColorAtlas();
-    atlas.DegreeInit();
-    for(int i = 0; i < PortNumber; i++){
-        port[i].PortDisInit(&atlas);
+    ColorAtlas();
+    DegreeInit();
+    for (int id = 0; id <PortNumber; id ++) {
+        PortDisInit(port[id].x, port[id].y, id);
     }
 }
 
 void Controller::RunByFrame() {
-
     int nowamoney = 0;
     while(NowFrame < FrameLimit) {
         cin >> NowFrame >> nowamoney;
-        ItemUpdateByFrame(NowFrame);
+        ItemUpdateByFrame();
 
         for(int i = 0; i < RobotNumber; i++) {
             int carry, x, y, status;
@@ -116,7 +112,6 @@ void Controller::RunByFrame() {
             int status, tarid;
             cin >> status >> tarid;
             ship[i].update((ShipStatus)status, tarid);
-            ship[i].NowFrame = NowFrame;
             // the status is accordingly assigned to integers, in 'common.h'
         }
         // Ship Data Update
@@ -128,7 +123,7 @@ void Controller::RunByFrame() {
             {
                 // origin version
                 RobotPull();
-                GenerateOrders(robot, ItemList, port, ItemMap, atlas, NowFrame);
+                GenerateOrders(robot, ItemPosList, port, ItemMap, NowFrame);
                 RobotGet();
                 // avoidCollison(robot, atlas); // NOTE this function 
                 RobotMove();
@@ -145,85 +140,9 @@ void Controller::RunByFrame() {
             //     RobotFakeGet();
             // }
         }
-
-        {
-            fstream out;
-            out.open("log.txt", std::ios::app);
-            out << "NowFrame is " << NowFrame << endl;
-            out << "port.totalItemCnt is ";
-            for (int i = 0; i < PortNumber; i++) {
-                out << port[i].totalItemCnt << " ";
-            }
-            out << endl;
-            out << "port.nowItemCnt is ";
-            for (int i = 0; i < PortNumber; i++) {
-                out << port[i].nowItemCnt << " ";
-            }
-            out << endl;
-            out.close();
-        }
         
         AutoShipLoad();
-        // ShipSchedule();
-        ShipScheduleNew();
-        
-        if (NowFrame == 15000) {
-            {
-                fstream out;
-                out.open("log.txt", std::ios::app);
-                out << MyTotalTransport << endl; // robot have pulled
-                out << MyTotalVal << endl;
-                out << "ship.haveLoad is ";
-                for (int i = 0; i < ShipNumber; i++) {
-                    out << ship[i].HaveLoad << " ";
-                }
-                out << endl;
-                out << "port.nowItemCnt is ";
-                for (int i = 0; i < PortNumber; i++) {
-                    out << port[i].nowItemCnt << " ";
-                }
-                out << endl;
-                out << "AllValue is ";
-                for (int i = 1; i <= 200; i++) {
-                    out << AllValue[i].size() << " ";
-                    if ( i % 20 == 0)
-                        out << endl;
-                }
-                out << endl;
-                out << "Port shut down: ";
-                for(auto it : portShutDown) {
-                    out << it << " ";
-                }
-                out << endl;
-                out.close();
-            }
-            {
-                fstream fout;
-                fout.open("robotPath.txt", std::ios::app);
-                for (int i = 0; i < RobotNumber; i++) {
-                    fout << "robot " << i << " path size is " << robotPathSize[i].size() << endl;
-                    for (int j = 0; j < robotPathSize[i].size(); j++) {
-                        fout << robotPathSize[i][j].second << "\t" << robotPathSize[i][j].first.first << "\t" << robotPathSize[i][j].first.second << "\t";
-                        fout << robotItemValue[i][j].first << "\t" << robotItemValue[i][j].second << endl;
-                    }
-                    fout << endl;
-                }
-                fout.close();
-            }
-            {
-                fstream fout;
-                fout.open("shipPath.txt", std::ios::app);
-                for (int i = 0; i < ShipNumber; i++) {
-                    fout << "ship " << i << " path" << endl;
-                    for (int j = 0; j < shipPathSize[i].size(); j++) {
-                        if(shipPathSize[i][j].first.second == -1) break;
-                        fout << shipPathSize[i][j].first.first << "\t" << shipPathSize[i][j].first.second  << "\t" << shipPathSize[i][j].second << endl;
-                    }
-                    fout << endl;
-                }
-                fout.close();
-            }
-        }
+        ShipSchedule();
 
         printf("OK\n");
         fflush(stdout);
@@ -231,8 +150,8 @@ void Controller::RunByFrame() {
     // file.close();
 }
 
-void Controller::ItemUpdateByFrame(int frameID) {
-    ItemTimeOutDisappear(frameID);
+void Controller::ItemUpdateByFrame() {
+    ItemTimeOutDisappear();
     // Kick out disappeared items
 
     int NewItemCount;
@@ -240,41 +159,64 @@ void Controller::ItemUpdateByFrame(int frameID) {
 
     fstream out;
     out.open("log.txt", std::ios::app);
-    out << "NowFrame is " << frameID << " NewItemCount is " << NewItemCount << endl;
+    out << "NowFrame is " << NowFrame << " NewItemCount is " << NewItemCount << endl;
     
     for(int i = 1; i <= NewItemCount; i++) {
         int x, y, val;
         cin >> x >> y >> val;
         out << "x is " << x << " y is " << y << " val is " << val << endl;
-        int aimid = -1, nowadis = INF;
-        for(int j = 0; j < PortNumber; j++) { // search for the nearest port
-            if (port[j].isopen() == false) continue; // NOTE this port is closed
-            int disj = port[j].GetDis(x, y); // get the distance to the port j (this is color)
-            if(disj == -1) continue; // unreachable
-            if(disj < nowadis) nowadis = disj , aimid = j;
+        for (int j = 0; j < PortNumber; j ++) {
+            if (port[j].isopen() == false) {
+                continue;
+            }
+            int disj = PortGetDis(x, y, j);
+            if (disj != -1) {
+                ItemPosList.push({x, y});
+                ItemMap[x][y] = Item(NowFrame, x, y, val);
+                AllItemValue += val;
+                AllItemNum ++;
+                break;
+            }
         }
-        if(aimid == -1) continue;
-        AllItemValue += val;
-        AllItemNum ++;
-        ItemList.emplace(Item(frameID, x, y, val, aimid));
-        ItemMap[x][y] = Item(frameID, x, y, val, aimid);
+        // int aimid = -1, nowadis = INF;
+        // for(int j = 0; j < PortNumber; j++) { // search for the nearest port
+        //     if (port[j].isopen() == false) continue; // NOTE this port is closed
+        //     int disj = PortGetDis(x, y, j); // get the distance to the port j (this is color)
+        //     if(disj == -1) continue; // unreachable
+        //     if(disj < nowadis) nowadis = disj , aimid = j;
+        // }
+        // if(aimid == -1) continue;
+        // AllItemValue += val;
+        // AllItemNum ++;
+        // ItemList.emplace(Item(NowFrame, x, y, val, aimid));
+        // ItemMap[x][y] = Item(NowFrame, x, y, val, aimid);
     }
     // Finish new item input
 
     out.close();
 }
 
-void Controller::ItemTimeOutDisappear(int frameID) {
-    while(ItemList.size()) {
-        Item it = ItemList.front();
-        if(it.BirthFrame + ExistFrame <= frameID) {
-            ItemMap[it.x][it.y] = EmptyItem;
-            ItemList.pop();
+void Controller::ItemTimeOutDisappear() {
+    while (ItemPosList.size()) {
+        int x = ItemPosList.front().first, y = ItemPosList.front().second;
+        if (ItemMap[x][y].BirthFrame + ExistFrame <= NowFrame) {
+            ItemMap[x][y] = EmptyItem;
+            ItemPosList.pop();
         }
         else {
             break;
         }
     }
+    // while(ItemList.size()) {
+    //     Item it = ItemList.front();
+    //     if(it.BirthFrame + ExistFrame <= NowFrame) {
+    //         ItemMap[it.x][it.y] = EmptyItem;
+    //         ItemList.pop();
+    //     }
+    //     else {
+    //         break;
+    //     }
+    // }
 }
 
 void Controller::RobotPull() {
@@ -303,8 +245,8 @@ void Controller::RobotGet() {
             ItemMap[robot[i].targetX][robot[i].targetY] = EmptyItem; // kick out 
             int aimport = robot[i].targetport; // task switch
             robot[i].get(port[aimport].x, port[aimport].y);
-            AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search path because task switch
-            robotPathSize[i][robotPathSize[i].size() - 1].first.second = robot[i].pathWithTime.size();
+            AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search path because task switch
+            robotPathSize[i][robotPathSize[i].size() - 1].second = robot[i].pathWithTime.size();
         }
     } 
 }
@@ -348,7 +290,7 @@ void Controller::RobotRealGet() {
         if (robot[i].nowx == robot[i].targetX && robot[i].nowy == robot[i].targetY) { 
             ItemMap[robot[i].targetX][robot[i].targetY] = EmptyItem; // kick out 
             robot[i].RealGet(port[robot[i].targetport].x, port[robot[i].targetport].y);
-            AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search path because task switch
+            AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search path because task switch
         }
     }
 }
@@ -358,11 +300,11 @@ void Controller::RobotMove() {
         if (robot[i].IsAvailable == false) {
             if (robot[i].UnavailableMoment == 0) {
                 robot[i].UnavailableMoment = NowFrame;
-                AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because this robot is unavailable
+                AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search new path because this robot is unavailable
             }
             else if (robot[i].UnavailableMoment + 20 <= robot[i].NowFrame) { // new crash occured
                 robot[i].UnavailableMoment += 10; // FIXME estimate after 10 frames, a new crash occured
-                AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because a new crash occured
+                AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search new path because a new crash occured
             }
             // FIXME not sure if this is the right way to handle this
             robot[i].NextX = robot[i].nowx;
@@ -416,6 +358,7 @@ void Controller::AutoShipLoad(){
     }
 }
 
+// TODO not be called now
 void Controller::ShipSchedule(){
     if (NowFrame == 1) {
         for (int i = 0; i < ShipNumber; i++) {
@@ -424,7 +367,7 @@ void Controller::ShipSchedule(){
         }
         return;
     }
-    GenerateShipOrders(port, ship, NowFrame);
+    GenerateShipOrdersNew(port, ship, NowFrame);
 
     ShipMoveOrSell();
 }
@@ -468,38 +411,6 @@ void Controller::ShipMoveOrSell(){
     
 }
 
-void Controller::ShipScheduleNew(){
-    if (NowFrame == 1) {
-        for (int i = 0; i < ShipNumber; i++) {
-            ship[i].aimPort = i;
-            port[i].isbooked = true;
-        }
-        return;
-    }
-    if(NowFrame == FrameLastTimeHandle){
-        HandleLastFrames(port, ship, NowFrame);
-    }
-
-    {
-       if(NowFrame == FrameLastTimeHandle + 1){
-            fstream out;
-            out.open("port.txt", std::ios::app);
-            for(int i = 0; i < PortNumber; i++){
-                out << port[i].isopen() << " ";
-            }
-            out << endl;
-            out.close();
-        }
-    }
-    
-
-    GenerateShipOrders(port, ship, NowFrame);
-    ShipMoveOrSell();
-
-    return;
-}
-
-
 
 
 /*****************************not use in this project****************************/
@@ -508,11 +419,11 @@ void Controller::RobotUnavailableSearchNewPath() {
         if (robot[i].IsAvailable == false) {
             if (robot[i].UnavailableMoment == 0) {
                 robot[i].UnavailableMoment = NowFrame;
-                AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because this robot is unavailable
+                AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search new path because this robot is unavailable
             }
             else if (robot[i].UnavailableMoment + 20 <= robot[i].NowFrame) { // new crash occured
                 robot[i].UnavailableMoment += 10; // FIXME estimate after 10 frames, a new crash occured
-                AstarTimeEpsilonWithConflict(robot[i], atlas, EPSILON, robot); // search new path because a new crash occured
+                AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search new path because a new crash occured
             }
         }
     }

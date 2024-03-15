@@ -8,10 +8,12 @@ public:
     int destination;
     bool booked;
     bool operator != (const Item &a) const;
+    bool operator == (const Item &a) const;
     /**
      * @brief Construct function with full parmas
     */
     Item(int frame, int x, int y, int val, int des);
+    Item(int frame, int x, int y, int val): BirthFrame(frame), x(x), y(y), value(val), destination(-1), booked(false) {}
 
     bool isbooked();
     void book();

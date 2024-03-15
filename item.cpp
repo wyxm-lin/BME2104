@@ -11,6 +11,10 @@ bool Item::operator!=(const Item &a)const {
     return (a.BirthFrame != BirthFrame) || (x != a.x) || (y != a.y) || (value != a.value);
 }
 
+bool Item::operator == (const Item &a) const {
+    return (a.BirthFrame == BirthFrame) && (x == a.x) && (y == a.y) && (value == a.value);
+}
+
 void Item::book() {
     booked = true;
 }

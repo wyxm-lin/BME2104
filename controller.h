@@ -11,14 +11,15 @@
 #include "shipOrder.h"
 
 using std::queue;
+using std::pair;
 
 class Controller {
 public:
     Robot robot[RobotNumber];
     Port port[PortNumber];
     Ship ship[ShipNumber];
-    Atlas atlas;
     queue <Item> ItemList;
+    queue <pair<int, int>> ItemPosList;
     Item ItemMap[MapSize][MapSize];
     int NowFrame = 0;
 
@@ -48,12 +49,12 @@ public:
     /**
      * @brief Update Item infomation according to the input
     */
-    void ItemUpdateByFrame(int frameID);
+    void ItemUpdateByFrame();
 
     /**
      * @brief pop time-out-items from ItemList queue
     */
-    void ItemTimeOutDisappear(int frameID);
+    void ItemTimeOutDisappear();
 
     /**
      * @brief Robot All possible action
@@ -77,8 +78,6 @@ public:
     void ShipSchedule();
 
     void ShipMoveOrSell();
-
-    void ShipScheduleNew();
 
     /**********************not use in this project********************************/
     void RobotUnavailableSearchNewPath();

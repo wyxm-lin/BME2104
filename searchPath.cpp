@@ -11,9 +11,11 @@ using std::unordered_set;
 using std::fstream;
 using std::unordered_map;
 
+extern MapStatus atlas[MapSize][MapSize];
+extern int color[MapSize][MapSize];
 
-void SearchPath(Robot &robot, Atlas& atlas) {
-    AstarTimeEpsilon(robot, atlas, 1.0); // FIXME epsilon value
+void SearchPath(Robot &robot) {
+    AstarTimeEpsilon(robot, 1.0); // FIXME epsilon value
 }
 
 void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[RobotNumber]) {
@@ -28,7 +30,7 @@ void bitsetReset(bitset<RobotNumber> (&a)[MapSize][MapSize], Robot (&robot)[Robo
     }
 }
 
-void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
+void avoidCollison(Robot (&robot)[RobotNumber]) {
     bitset <RobotNumber> passThrough[MapSize][MapSize];
     // memset(passThrough, 0, sizeof(passThrough));
 
@@ -141,7 +143,7 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
                 // }
 
                 // TODO: detect collision, research path
-                AstarTimeEpsilonWithConflict(robot[i2], atlas, EPSILON, robot);
+                AstarTimeEpsilonWithConflict(robot[i2], EPSILON, robot);
                 // robot[i2].pathWithTime = pathModify;
                 bitsetReset(passThrough, robot);
                 modifyFlag = true;
@@ -150,7 +152,7 @@ void avoidCollison(Robot (&robot)[RobotNumber], Atlas& atlas) {
     }
 }
 
-void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
+void AstarTimeEpsilon(Robot &robot, double epsilon) {
     if (!robot.IsWorking) {
         return;
     }
@@ -184,7 +186,7 @@ void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
             if (valid(nextX, nextY) == false) {
                 continue;
             }
-            if (reachable(atlas.atlas[nextX][nextY], atlas.atlas[x][y]) == false) {
+            if (reachable(atlas[nextX][nextY], atlas[x][y]) == false) {
                 continue;
             }
             if (vis[nextX][nextY]) { // has visited
@@ -209,7 +211,7 @@ void AstarTimeEpsilon(Robot &robot, Atlas &atlas, double epsilon) {
     robot.OccupiedNodeSet.insert(pathWithTime.begin(), pathWithTime.end());
 }
 
-void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Robot (&otherRobot)[RobotNumber]) {
+void AstarTimeEpsilonWithConflict(Robot &robot, double epsilon, Robot (&otherRobot)[RobotNumber]) {
     int NowRobotId = robot.id;
     if (!robot.IsWorking) {
         return;
@@ -244,7 +246,7 @@ void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Ro
             if (valid(nextX, nextY) == false) {
                 continue;
             }
-            if (reachable(atlas.atlas[nextX][nextY], atlas.atlas[x][y]) == false) {
+            if (reachable(atlas[nextX][nextY], atlas[x][y]) == false) {
                 continue;
             }
             if (vis[nextX][nextY]) { // has visited
@@ -293,6 +295,6 @@ void AstarTimeEpsilonWithConflict(Robot &robot, Atlas &atlas, double epsilon, Ro
         robot.OccupiedNodeSet.insert(pathWithTime.begin(), pathWithTime.end());
     }
     else {
-        AstarTimeEpsilon(robot, atlas, epsilon); // if no path and no conflict, use AstarTimeEpsilon
+        AstarTimeEpsilon(robot, epsilon); // if no path and no conflict, use AstarTimeEpsilon
     }
 }

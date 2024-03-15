@@ -5,6 +5,34 @@
 using std::cout;
 using std::endl;
 using std::bitset;
+using std::queue;
+using std::pair;
+
+extern int color[MapSize][MapSize];
+
+int RobotDis[RobotNumber][MapSize][MapSize];
+
+void RobotDisUpdate(int RobotX, int RobotY, int id) {
+    memset(RobotDis[id], -1, sizeof(RobotDis[id]));
+    RobotDis[id][RobotX][RobotY] = 0;
+    queue<pair<int, int>> q;
+    q.push({RobotX, RobotY});
+    while (q.size()) {
+        int x_ = q.front().first, y_ = q.front().second;
+        q.pop();
+        for (int k = 0; k < 4; k++) {
+            int nx = x_ + dx[k], ny = y_ + dy[k];
+            if (valid(nx, ny) && RobotDis[id][nx][ny] == -1 && color[nx][ny] == color[x_][y_]) {
+                RobotDis[id][nx][ny] = RobotDis[id][x_][y_] + 1;
+                q.push({nx, ny});
+            }
+        }
+    }
+}
+
+int RobotGetDis(int x, int y, int id) {
+    return RobotDis[id][x][y];
+}
 
 void Robot::update(int x, int y, bool carry, bool available, int frameID) {
     nowx = x, nowy = y;
