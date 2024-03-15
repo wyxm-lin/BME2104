@@ -19,7 +19,7 @@
 #include <cmath>
 #include <set>
 
-#define DEBUG
+// #define DEBUG
 
 const int RobotNumber = 10; // the number of robot
 const int ShipNumber = 5; // the number of ship
