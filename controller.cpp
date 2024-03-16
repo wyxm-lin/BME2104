@@ -100,6 +100,9 @@ void Controller::PreProcess() {
     for (int id = 0; id <PortNumber; id ++) {
         PortDisInit(port[id].x, port[id].y, id);
     }
+    for (int id = 0; id < RobotNumber; id++) {
+        RobotDisUpdate(robot[id].nowx, robot[id].nowy, id);
+    }
 }
 
 void Controller::RunByFrame() {
@@ -127,7 +130,18 @@ void Controller::RunByFrame() {
         cin >> OKstring;
         // Read 'OK'
 
-        if (NowFrame < RobotStopFrame) {
+        if (NowFrame == 13500) {
+            for (int i = 0; i < PortNumber; i ++) {
+                port[i].close();
+            }
+            for (int i = 0; i < ShipNumber; i++) {
+                if (ship[i].target == -1)
+                    continue;
+                port[ship[i].target].open();
+            }
+        }
+
+        if (NowFrame <= RobotStopFrame) {
             {
                 // origin version
                 RobotPull();

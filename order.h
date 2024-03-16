@@ -29,5 +29,6 @@ int ItemChoosePort(Item& it, Port (&port)[PortNumber]);
 void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize], int frameID);
 void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize], int frameID);
 void tryRetakeOrder(Robot &robot);
+void GenerateOrdersVersion3(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize], int frameID);
 
 #endif

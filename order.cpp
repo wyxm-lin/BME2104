@@ -109,6 +109,7 @@ int ItemChoosePort(Item& it, Port (&port)[PortNumber]) {
         if (port[i].isbooked == true) {
             dis /= 1.5;
         }
+        // dis /= (port[i].velocity);
         if (dis != -1 && dis < minDis) {
             minDis = dis;
             aimport = i;;
@@ -148,7 +149,7 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
         if (ItemMap[x][y] == EmptyItem) { // this item has been taken, just kick out
             continue;
         }
-        if (ItemMap[x][y].value < AllItemAveValue) { // NOTE
+        if (NowFrame < 13500 && ItemMap[x][y].value < AllItemAveValue) { // NOTE
             continue;
         }
         if (ItemMap[x][y].isbooked()) 
@@ -176,6 +177,9 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
             if (robot[i].oldPort != -1) {
                 ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
             } 
+            else {
+                ord.DisRobotToItem = RobotGetDis(x, y, i);
+            }
             if (ord.DisRobotToItem + NowFrame >= ItemMap[x][y].BirthFrame + ExistFrame) { // disappear
                 continue;
             }
@@ -208,6 +212,92 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
             robotPathSize[i].push_back({{robot[i].pathWithTime.size(), i}, NowFrame});
             robotItemValue[i].push_back({ord.it.value, ord.it.destination});
 #endif
+            break;
+        }
+    }
+}
+
+// don't matter
+void GenerateOrdersVersion3(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Port (&port)[PortNumber], Item (&ItemMap)[MapSize][MapSize], int NowFrame) {
+    if (AllItemNum == 0) {
+        return;
+    }
+    vector <Order> ords[RobotNumber];
+    AllItemAveValue = ((double)AllItemValue) / AllItemNum; // calculate the average value of all items
+    vector <Order> AllOrders;
+    while (Q.size()) {
+        int x = Q.front().first, y = Q.front().second;
+        Q.pop();
+        if (ItemMap[x][y] == EmptyItem) { // this item has been taken, just kick out
+            continue;
+        }
+        if (ItemMap[x][y].value < AllItemAveValue) { // NOTE
+            continue;
+        }
+        if (ItemMap[x][y].isbooked()) 
+        {
+            continue;
+        }
+        // int aimport = ItemMap[x][y].destination;
+        int aimport = ItemChoosePort(ItemMap[x][y], port); // choose the port: now just choose the nearest port
+        if (aimport == -1) { // no port can be chosen
+            continue;
+        }
+        for (int i = 0; i < RobotNumber; i++) {
+            if (color[robot[i].nowx][robot[i].nowy] != color[port[aimport].x][port[aimport].y]) { // robot and port are not in the same area
+                continue;
+            }
+            if (robot[i].UnableTakeOrder()) { // TODO think how to define this function to take order when in half way
+                continue;
+            }
+            if (ItemMap[x][y].value < robot[i].ValueLimit) {
+                continue;
+            }
+            Order ord;
+            ord.DisItemToPort = PortGetDis(x, y, aimport); // exact distance from item to port
+            if (robot[i].oldPort != -1) {
+                ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
+            } 
+            else {
+                ord.DisRobotToItem = RobotGetDis(x, y, i);
+            }
+            if (ord.DisRobotToItem + NowFrame >= ItemMap[x][y].BirthFrame + ExistFrame) { // disappear
+                continue;
+            }
+            if (ord.DisRobotToItem + ord.DisItemToPort + NowFrame + port[aimport].T >= TotalFrame) { // no enough time to finish the order
+                continue;
+            }
+            ord.PortId = aimport;
+            ord.RobotId = i;
+            ord.val = (double)ItemMap[x][y].value / (ord.DisItemToPort + ord.DisRobotToItem); // TODO how to define the value of the order
+            ord.it = ItemMap[x][y];
+            // ords[i].push_back(ord);
+            AllOrders.push_back(ord);
+        }
+    }
+
+    sort(AllOrders.begin(), AllOrders.end());
+    int WorkingRobotCnt = 0;
+    for (int i = 0; i < RobotNumber; i++) {
+        if (robot[i].IsWorking) {
+            WorkingRobotCnt++;
+        }
+    }
+    for (int i = 0; i < AllOrders.size(); i ++) {
+        int RobotId = AllOrders[i].RobotId;
+        if (robot[RobotId].UnableTakeOrder()) {
+            continue;
+        }
+        int px = AllOrders[i].it.x;
+        int py = AllOrders[i].it.y;
+        if (ItemMap[px][py].isbooked()) {
+            continue;
+        }
+        ItemMap[px][py].book();
+        robot[RobotId].TakeOrder(AllOrders[i].it);
+        AstarTimeEpsilonWithConflict(robot[RobotId], EPSILON, robot);
+        WorkingRobotCnt ++;
+        if (WorkingRobotCnt == RobotNumber) {
             break;
         }
     }
