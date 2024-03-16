@@ -12,6 +12,12 @@ extern int color[MapSize][MapSize];
 
 int RobotDis[RobotNumber][MapSize][MapSize];
 
+void RobotDisUpdateBatch(Robot robot[RobotNumber], int start, int end) {
+    for (int i = start; i <= end; i++) {
+        RobotDisUpdate(robot[i].nowx, robot[i].nowy, i);
+    }
+}
+
 void RobotDisUpdate(int RobotX, int RobotY, int id) {
     memset(RobotDis[id], -1, sizeof(RobotDis[id]));
     RobotDis[id][RobotX][RobotY] = 0;

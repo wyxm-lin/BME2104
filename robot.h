@@ -55,6 +55,7 @@ public:
     void RobotPrintPath();
 };
 
+void RobotDisUpdateBatch(Robot robot[RobotNumber], int start, int end);
 void RobotDisUpdate(int RobotX, int RobotY, int id);
 int RobotGetDis(int x, int y, int id);
 

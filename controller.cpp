@@ -184,6 +184,7 @@ void Controller::ItemUpdateByFrame() {
             if (disj != -1) {
                 ItemPosList.push({x, y});
                 ItemMap[x][y] = Item(NowFrame, x, y, val);
+                // ItemMap[x][y].destination = ItemChoosePort(ItemMap[x][y], port);
                 AllItemValue += val; // maintain this variable
                 AllItemNum ++; // maintain this variable
                 break;

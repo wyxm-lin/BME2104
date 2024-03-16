@@ -7,6 +7,7 @@
 using std::queue;
 using std::vector;
 using std::sort;
+using std::thread;
 
 extern double AllItemAveValue;
 extern int AllItemValue;
@@ -95,13 +96,16 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
 }
 
 // choose a port for the item
-static int ItemChoosePort(Item& it, Port (&port)[PortNumber]) {
+int ItemChoosePort(Item& it, Port (&port)[PortNumber]) {
     int aimport = -1, minDis = INF;
     for (int i = 0; i < PortNumber; i++) {
         if (port[i].isopen() == false) {
             continue;
         }
         int dis = PortGetDis(it.x, it.y, i);
+        if (dis == -1) {
+            continue;
+        }
         if (dis != -1 && dis < minDis) {
             minDis = dis;
             aimport = i;;
@@ -119,9 +123,22 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
     }
     vector <Order> ords[RobotNumber];
     AllItemAveValue = ((double)AllItemValue) / AllItemNum; // calculate the average value of all items
-    for (int id = 0; id < RobotNumber; id++) {
-        RobotDisUpdate(robot[id].nowx, robot[id].nowy, id);
-    }
+
+    // thread t[2];
+    // t[0] = thread(RobotDisUpdateBatch, robot, 0, 4);
+    // t[1] = thread(RobotDisUpdateBatch, robot, 5, 9);
+    // t[0].join();
+    // t[1].join();
+    // thread t[RobotNumber];
+    // for (int id = 0; id < RobotNumber; id++) {
+    //     t[id] = thread(RobotDisUpdate, robot[id].nowx, robot[id].nowy, id);
+    // }
+    // for (int id = 0; id < RobotNumber; id++) {
+    //     t[id].join();
+    // }
+    // for (int id = 0; id < RobotNumber; id++) {
+    //     RobotDisUpdate(robot[id].nowx, robot[id].nowy, id);
+    // }
     while (Q.size()) {
         int x = Q.front().first, y = Q.front().second;
         Q.pop();
@@ -135,6 +152,7 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
         {
             continue;
         }
+        // int aimport = ItemMap[x][y].destination;
         int aimport = ItemChoosePort(ItemMap[x][y], port); // choose the port: now just choose the nearest port
         if (aimport == -1) { // no port can be chosen
             continue;
@@ -151,7 +169,10 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
             }
             Order ord;
             ord.DisItemToPort = PortGetDis(x, y, aimport); // exact distance from item to port
-            ord.DisRobotToItem = RobotGetDis(x, y, i); // exact distance from robot to item
+            // ord.DisRobotToItem = RobotGetDis(x, y, i); // exact distance from robot to item
+            if (robot[i].oldPort != -1) {
+                ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
+            } 
             if (ord.DisRobotToItem + NowFrame >= ItemMap[x][y].BirthFrame + ExistFrame) { // disappear
                 continue;
             }
