@@ -12,6 +12,10 @@ int main() {
     out.close();
     out.open("port.txt", ios::out);
     out.close();
+    out.open("ship.txt", ios::out);
+    out.close();
+    out.open("item.txt", ios::out);
+    out.close();
     Controller BME2104;
     BME2104.Init();
     BME2104.RunByFrame();

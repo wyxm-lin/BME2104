@@ -16,7 +16,7 @@ struct ShipOrder {
     int shipId, portId;
     double val;
     ShipOrder(): port(), shipId(-1), portId(-1), val(0.0) {}
-    ShipOrder(Port p, int s, int pid, double v): port(p), shipId(s), portId(pid), val(v) {}
+    ShipOrder(Port p, int shipId_, int portId_, double value): port(p), shipId(shipId_), portId(portId_), val(value) {}
 
     bool operator < (const ShipOrder &a) const {
         return val < a.val;
@@ -26,5 +26,7 @@ struct ShipOrder {
 void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
 
 void HandleLastFrames(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
+
+void GenerateShipOrdersNew(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame);
 
 #endif // SHIPORDER_H

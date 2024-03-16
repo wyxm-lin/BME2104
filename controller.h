@@ -71,6 +71,7 @@ public:
      * @brief Maintain port items and ship items and such things
      */
     void AutoShipLoad();
+    
 
     /**
      * @brief Operate ship movements
@@ -78,6 +79,8 @@ public:
     void ShipMoveOrSell();
     void ShipSchedule();
 
+    void ShipMoveNew();
+    void AutoShipLoadNew();
 
     /**********************not use in this project********************************/
     void RobotUnavailableSearchNewPath();

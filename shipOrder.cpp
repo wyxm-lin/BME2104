@@ -4,6 +4,7 @@ using std::priority_queue;
 using std::fstream;
 using std::ios;
 using std::endl;
+using std::min;
 using std::vector;
 
 extern vector <int> portShutDown;
@@ -76,7 +77,11 @@ void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int 
                 
             }
             else { // ship is simply loading
-                
+                if (port[i].T + NowFrame >= TotalFrame) { // must go to virtual point // NOTE this has a bug
+                    port[i].isbooked = false;
+                    ship[i].aimPort = -1;
+                    ship[i].Sell();
+                }
             }
         }
         else if (ship[i].status == MOVING) {
@@ -100,7 +105,7 @@ void HandleLastFrames(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int No
         if (ship[i].status == SHIPPING || ship[i].status == MOVING) {
             if (ship[i].target != -1) { // moving to a certain port || at a certain port
                 port[ship[i].target].close();
-#ifdef DEBUG
+#ifdef LOG
                 portShutDown.push_back(ship[i].target);
 #endif
             }
@@ -127,7 +132,7 @@ void HandleLastFrames(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int No
                 ship[i].portLastGo = ports.top().id;
                 ports.pop();
                 port[ship[i].portLastGo].close();
-#ifdef DEBUG
+#ifdef LOG
                 portShutDown.push_back(ship[i].portLastGo);
 #endif
             }
@@ -141,9 +146,105 @@ void HandleLastFrames(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int No
                 ship[i].portLastGo = ports.top().id;
                 ports.pop();
                 port[ship[i].portLastGo].close();
-#ifdef DEBUG
+#ifdef LOG
                 portShutDown.push_back(ship[i].portLastGo);
 #endif
+            }
+        }
+    }
+}
+
+void GenerateShipOrdersNew(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame){
+    if (NowFrame == 1) {
+        for (int i = 0; i < ShipNumber; i++) {
+            ship[i].aimPort = i;
+            ship[i].AtVirtualPoint = true;
+            ship[i].PrintShip = true;
+            port[i].isbooked = true;
+        }
+        return;
+    }
+
+    vector<ShipOrder> shipOrder;
+    for (int i = 0; i < PortNumber; i++) {
+        if (port[i].isopen() == false) {
+            continue;
+        }
+        if (port[i].isbooked) {
+            continue;
+        }
+        double val = (double)port[i].nowItemCnt;    // TODO maybe change to another way
+        shipOrder.push_back(ShipOrder(port[i], -1, i, val));
+    }
+    sort(shipOrder.begin(), shipOrder.end());
+    reverse(shipOrder.begin(), shipOrder.end());
+
+    for (int i = 0; i < ShipNumber; i++) {
+        ship[i].PrintGo = ship[i].PrintShip = false; // reset
+
+        if (ship[i].FromPortToVirtual == true || ship[i].FromVirtualToPort == true || ship[i].FromPortToPort == true) {
+            // TODO maybe do nothing
+        }
+        else if (ship[i].AtPortWaiting == true) {
+            // TODO maybe do nothing (ps. Now this situation won't happen)
+        }
+        else if (ship[i].AtVirtualPoint) {
+            for (int j = 0; j < shipOrder.size(); j++) {
+                int Id = shipOrder[j].portId;
+                if (port[Id].isbooked) {  // maybe changed by other ships in the same frame
+                    continue;
+                }
+                if (NowFrame + port[Id].T * 2 + 1 <= TotalFrame) {
+                    port[Id].isbooked = true;
+                    ship[i].aimPort = Id;
+                    ship[i].PrintShip = true;
+                    break;
+                }
+            }
+        }
+        else if (ship[i].AtPortLoading) {
+            if (ship[i].ShouldLeaveNowPort) {
+                if (ship[i].HaveLoad == ship[i].capacity) { // ship is full
+                    ship[i].aimPort = -1;
+                    ship[i].PrintGo = true;
+                }
+                else { // ship is not full
+                    bool TakeOrder = false;
+                    for (int j = 0; j < shipOrder.size(); j++) {
+                        int Id = shipOrder[j].portId;
+                        if (port[Id].isbooked) {  // maybe changed by other ships in the same frame
+                            continue;
+                        }
+                        if (Id == ship[i].target) { // NOTE not choose origin port
+                            continue;
+                        }
+                        if (NowFrame + 500 + 1 + port[Id].T <= TotalFrame) {
+                            int increase = min(ship[i].capacity - ship[i].HaveLoad, port[Id].nowItemCnt);
+                            // int increase = min(ship[i].capacity - ship[i].HaveLoad, port[Id].nowItemCnt + (int)((double)Port[Id].totalItemCnt / NowFrame * 500));
+                            int FirstPathTime = NowFrame - ship[i].LeaveVirtualPointFrame;
+                            int NowPortId = ship[i].target;
+                            if (ship[i].HaveLoad * (FirstPathTime + 500 + increase / port[Id].velocity + port[Id].T) >= (ship[i].HaveLoad + increase) * (FirstPathTime + port[NowPortId].T)) {
+                                continue;
+                            }
+                            port[Id].isbooked = true;
+                            ship[i].aimPort = Id;
+                            ship[i].PrintShip = true;
+                            TakeOrder = true;
+                            break;
+                        }
+                    }
+                    if (TakeOrder == false) {
+                        ship[i].aimPort = -1;
+                        ship[i].PrintGo = true;
+                    }
+                }
+            }
+            else { // ship is simply loading
+                if (port[ship[i].target].T + NowFrame == TotalFrame) {
+                    port[ship[i].target].isbooked = false;
+                    ship[i].aimPort = -1;
+                    ship[i].PrintGo = true;
+                }
             }
         }
     }

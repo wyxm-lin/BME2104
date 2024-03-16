@@ -86,7 +86,7 @@ void GenerateOrders(Robot (&robot)[RobotNumber], queue <Item> Q, Port (&port)[Po
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
             AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot);
-#ifdef DEBUG
+#ifdef LOG
             robotPathSize[i].push_back({{robot[i].pathWithTime.size(), i}, NowFrame});
             robotItemValue[i].push_back({ord.it.value, ord.it.destination});
 #endif
@@ -105,6 +105,9 @@ int ItemChoosePort(Item& it, Port (&port)[PortNumber]) {
         int dis = PortGetDis(it.x, it.y, i);
         if (dis == -1) {
             continue;
+        }
+        if (port[i].isbooked == true) {
+            dis /= 1.5;
         }
         if (dis != -1 && dis < minDis) {
             minDis = dis;
@@ -201,7 +204,7 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
             AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot);
-#ifdef DEBUG
+#ifdef LOG
             robotPathSize[i].push_back({{robot[i].pathWithTime.size(), i}, NowFrame});
             robotItemValue[i].push_back({ord.it.value, ord.it.destination});
 #endif
