@@ -122,7 +122,7 @@ void Controller::RunByFrame() {
             int status, tarid;
             cin >> status >> tarid;
             ship[i].update((ShipStatus)status, tarid, NowFrame);
-            ship[i].NowFrame = NowFrame;
+            // ship[i].NowFrame = NowFrame;
             // the status is accordingly assigned to integers, in 'common.h'
         }
         // Ship Data Update
