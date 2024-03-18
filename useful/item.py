@@ -59,4 +59,4 @@ def parse(path):
     print("生成物品总数：", total_new_items)
 
 if __name__ == "__main__":
-    parse("../log.txt")
+    parse("../item.txt")

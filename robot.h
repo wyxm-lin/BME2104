@@ -59,5 +59,5 @@ public:
 void RobotDisUpdateBatch(Robot robot[RobotNumber], int start, int end);
 void RobotDisUpdate(int RobotX, int RobotY, int id);
 int RobotGetDis(int x, int y, int id);
-
+int RobotGetDis(int x_, int y_, int id, int robotX, int robotY);
 #endif

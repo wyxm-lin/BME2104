@@ -7,6 +7,7 @@ using std::endl;
 using std::bitset;
 using std::queue;
 using std::pair;
+using std::priority_queue;
 
 extern int color[MapSize][MapSize];
 
@@ -39,6 +40,41 @@ void RobotDisUpdate(int RobotX, int RobotY, int id) {
 int RobotGetDis(int x, int y, int id) {
     return RobotDis[id][x][y];
 }
+
+struct RobotAstarNode {
+    int x, y, g;
+    double h;
+    RobotAstarNode(int x_, int y_, int g_, double h_): x(x_), y(y_), g(g_), h(h_) {}
+    bool operator < (const RobotAstarNode &b) const {
+        return g + h > b.g + b.h;
+    }
+};
+
+int RobotGetDis(int x_, int y_, int id, int robotX, int robotY) {
+    double alpha = 0.5;
+    memset(RobotDis[id], -1, sizeof(RobotDis[id]));
+    priority_queue <RobotAstarNode> openList;
+    int startX = robotX, startY = robotY;
+    int targetX = x_, targetY = y_;
+    RobotDis[id][startX][startY] = 0;
+    openList.push(RobotAstarNode(startX, startY, 0, alpha * (abs(startX - targetX) + abs(startY - targetY))));
+    while (openList.size()) {
+        int x = openList.top().x, y = openList.top().y, g = openList.top().g;
+        openList.pop();
+        if (x == targetX && y == targetY) {
+            return RobotDis[id][x][y];
+        }
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i], ny = y + dy[i];
+            if (valid(nx, ny) && color[nx][ny] == color[x][y] && RobotDis[id][nx][ny] == -1) {
+                RobotDis[id][nx][ny] = RobotDis[id][x][y] + 1;
+                openList.push(RobotAstarNode(nx, ny, g + 1, alpha * abs(nx - targetX) + abs(ny - targetY)));
+            }
+        }
+    }
+    return INF;
+}
+
 
 void Robot::update(int x, int y, bool carry, bool available, int frameID) {
     nowx = x, nowy = y;

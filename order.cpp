@@ -18,6 +18,7 @@ extern vector <pair<int, int> > robotItemValue[RobotNumber];
 
 extern int atlas[MapSize][MapSize];
 extern int color[MapSize][MapSize];
+extern int RobotDis[RobotNumber][MapSize][MapSize];
 
 /**
  * @brief go over all the items, calc the value of all orders, val = itemvalue / dis
@@ -128,11 +129,11 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
     vector <Order> ords[RobotNumber];
     AllItemAveValue = ((double)AllItemValue) / AllItemNum; // calculate the average value of all generated items
 
-    thread t[2];
-    t[0] = thread(RobotDisUpdateBatch, robot, 0, 4);
-    t[1] = thread(RobotDisUpdateBatch, robot, 5, 9);
-    t[0].join();
-    t[1].join();
+    // thread t[2];
+    // t[0] = thread(RobotDisUpdateBatch, robot, 0, 4);
+    // t[1] = thread(RobotDisUpdateBatch, robot, 5, 9);
+    // t[0].join();
+    // t[1].join();
     // thread t[RobotNumber];
     // for (int id = 0; id < RobotNumber; id++) {
     //     t[id] = thread(RobotDisUpdate, robot[id].nowx, robot[id].nowy, id);
@@ -174,17 +175,43 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
             if (ItemMap[x][y].value < robot[i].ValueLimit) {
                 continue;
             }
+            if (robot[i].IsWorking == true && ItemMap[x][y].BirthFrame != NowFrame) {
+                continue;
+            }
             Order ord;
             ord.DisItemToPort = PortGetDis(x, y, aimport); // exact distance from item to port
+            // ord.DisRobotToItem = RobotGetDis(x, y, i, robot[i].nowx, robot[i].nowy);
+            // {
+            //     using std::fstream;
+            //     using std::endl;
+            //     using std::ios;
+            //     fstream file;
+            //     file.open("debug.txt", ios::out | ios::app);
+            //     file << ord.DisRobotToItem << endl;
+            //     file.close();
+            // }
             // ord.DisRobotToItem = RobotGetDis(x, y, i); // exact distance from robot to item
-            if (robot[i].oldPort != -1) { // The robot has had taken order
-                //ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
-                ord.DisRobotToItem = RobotGetDis(x, y, i);
-                //NOTE FIXME modify here for switching order, turning to real-time robot-dis-to-item
-            } 
-            else { // The robot take order for the first time
-                ord.DisRobotToItem = RobotGetDis(x, y, i);
+            // if (robot[i].oldPort != -1) { // The robot has had taken order
+            //     ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
+            //     // ord.DisRobotToItem = RobotGetDis(x, y, i);
+            //     // NOTE FIXME modify here for switching order, turning to real-time robot-dis-to-item
+            // } 
+            // else { // The robot take order for the first time
+            //     ord.DisRobotToItem = RobotGetDis(x, y, i);
+            // }
+            // if (robot[i].IsWorking == true) {
+            //     ord.DisRobotToItem = RobotGetDis(x, y, i, robot[i].nowx, robot[i].nowy);
+            // }
+            // else {
+            //     ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
+            // }
+            if (robot[i].IsWorking == false || robot[i].oldPort == -1) {
+                ord.DisRobotToItem = RobotGetDis(x, y, i, robot[i].nowx, robot[i].nowy);
             }
+            else {
+                ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
+            }
+
             if (ord.DisRobotToItem + NowFrame >= ItemMap[x][y].BirthFrame + ExistFrame) { // disappear
                 continue;
             }
@@ -228,9 +255,10 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
 
 
             if(robot[i].IsWorking) {
-                if(ord.it.value <= robot[i].carryItem.value || RobotGetDis(ord.it.x, ord.it.y, i) >= RobotGetDis(robot[i].carryItem.x, robot[i].carryItem.y, i)) {
+                if(ord.it.value <= robot[i].carryItem.value || RobotGetDis(ord.it.x, ord.it.y, i, robot[i].nowx, robot[i].nowy) >= RobotGetDis(robot[i].carryItem.x, robot[i].carryItem.y, i, robot[i].nowx, robot[i].nowy)) {
                     continue;
                 }
+                
             }
 
             if (robot[i].IsWorking) {

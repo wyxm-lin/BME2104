@@ -224,7 +224,7 @@ void Controller::RunByFrame() {
             out << endl;
             out << "Total Pulled Value: " << TotalPullValue << endl;
             out << "Total Generated Value:" << AllItemValue << endl;
-
+            out << TotalPullCount << " " << AllItemNum << endl;
             out << endl;
             out.close();
 #endif
@@ -251,6 +251,8 @@ void Controller::ItemUpdateByFrame() {
     for(int i = 1; i <= NewItemCount; i++) {
         int x, y, val;
         cin >> x >> y >> val;
+        AllItemValue += val; // maintain this variable
+        AllItemNum ++; // maintain this variable
 #ifdef DEBUG
         out << "x is " << x << " y is " << y << " val is " << val << endl;
 #endif
@@ -263,8 +265,8 @@ void Controller::ItemUpdateByFrame() {
                 ItemPosList.push({x, y});
                 ItemMap[x][y] = Item(NowFrame, x, y, val);
                 // ItemMap[x][y].destination = ItemChoosePort(ItemMap[x][y], port);
-                AllItemValue += val; // maintain this variable
-                AllItemNum ++; // maintain this variable
+                // AllItemValue += val; // maintain this variable
+                // AllItemNum ++; // maintain this variable
                 break;
             }
         }
