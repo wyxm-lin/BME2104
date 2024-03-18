@@ -17,6 +17,7 @@ public:
 
     bool isbooked();
     void book();
+    void release();
 
     Item() = default;
     ~Item() = default;

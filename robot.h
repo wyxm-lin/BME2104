@@ -25,6 +25,7 @@ public:
     Item carryItem;
     int NextX, NextY;
 
+
     Robot(): id(-1), nowx(-1), nowy(-1), targetX(-1), targetY(-1), targetport(-1), oldPort(-1), IsCarry(false), IsAvailable(true), 
             IsWorking(false), ValueLimit(-1), RecoverFlag(false), pathIndex(-1), UnavailableMoment(0), NextX(-1), NextY(-1), NowFrame(0)
             {

@@ -15,6 +15,10 @@ bool Item::operator == (const Item &a) const {
     return (a.BirthFrame == BirthFrame) && (x == a.x) && (y == a.y) && (value == a.value);
 }
 
+void Item::release() {
+    booked = false;
+}
+
 void Item::book() {
     booked = true;
 }

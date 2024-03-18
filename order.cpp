@@ -126,13 +126,13 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
         return;
     }
     vector <Order> ords[RobotNumber];
-    AllItemAveValue = ((double)AllItemValue) / AllItemNum; // calculate the average value of all items
+    AllItemAveValue = ((double)AllItemValue) / AllItemNum; // calculate the average value of all generated items
 
-    // thread t[2];
-    // t[0] = thread(RobotDisUpdateBatch, robot, 0, 4);
-    // t[1] = thread(RobotDisUpdateBatch, robot, 5, 9);
-    // t[0].join();
-    // t[1].join();
+    thread t[2];
+    t[0] = thread(RobotDisUpdateBatch, robot, 0, 4);
+    t[1] = thread(RobotDisUpdateBatch, robot, 5, 9);
+    t[0].join();
+    t[1].join();
     // thread t[RobotNumber];
     // for (int id = 0; id < RobotNumber; id++) {
     //     t[id] = thread(RobotDisUpdate, robot[id].nowx, robot[id].nowy, id);
@@ -143,6 +143,9 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
     // for (int id = 0; id < RobotNumber; id++) {
     //     RobotDisUpdate(robot[id].nowx, robot[id].nowy, id);
     // }
+
+    //FIXME how to use this BFS based on thread?
+
     while (Q.size()) {
         int x = Q.front().first, y = Q.front().second;
         Q.pop();
@@ -174,10 +177,12 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
             Order ord;
             ord.DisItemToPort = PortGetDis(x, y, aimport); // exact distance from item to port
             // ord.DisRobotToItem = RobotGetDis(x, y, i); // exact distance from robot to item
-            if (robot[i].oldPort != -1) {
-                ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
+            if (robot[i].oldPort != -1) { // The robot has had taken order
+                //ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
+                ord.DisRobotToItem = RobotGetDis(x, y, i);
+                //NOTE FIXME modify here for switching order, turning to real-time robot-dis-to-item
             } 
-            else {
+            else { // The robot take order for the first time
                 ord.DisRobotToItem = RobotGetDis(x, y, i);
             }
             if (ord.DisRobotToItem + NowFrame >= ItemMap[x][y].BirthFrame + ExistFrame) { // disappear
@@ -202,9 +207,38 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
         for(auto ord: ords[i]) {
             int px = ord.it.x;
             int py = ord.it.y;
+            if (robot[i].IsWorking == true && ItemMap[px][py] == robot[i].carryItem) {
+                break; // if the robot has order taken and decide not to switch its order, give up
+            }
+
+            if (robot[i].IsWorking == true) {
+                using std::fstream;
+                using std::endl;
+                fstream out;
+                out.open("switch-order.txt", std::ios::app);
+                out << "Frame:" << NowFrame << endl;
+                out << "Robot Id:" << i << endl << endl;
+                // out << 
+                out.close();
+            }
+
             if (ItemMap[px][py].isbooked()) {
                 continue;
             }
+
+
+            if(robot[i].IsWorking) {
+                if(ord.it.value <= robot[i].carryItem.value || RobotGetDis(ord.it.x, ord.it.y, i) >= RobotGetDis(robot[i].carryItem.x, robot[i].carryItem.y, i)) {
+                    continue;
+                }
+            }
+
+            if (robot[i].IsWorking) {
+                int PreviousTargetX = robot[i].targetX, PreviousTargetY = robot[i].targetY;
+                ItemMap[PreviousTargetX][PreviousTargetY].release();
+                // The robot decides to switch order, release the previous order
+            }
+
             ItemMap[px][py].book();
             robot[i].TakeOrder(ord.it);
             AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot);

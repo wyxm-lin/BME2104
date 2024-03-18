@@ -220,7 +220,11 @@ void Controller::RunByFrame() {
             for (int i = 0; i < ShipNumber; i++) {
                 out << ship[i].HaveLoad << " ";
             }
+
             out << endl;
+            out << "Total Pulled Value: " << TotalPullValue << endl;
+            out << "Total Generated Value:" << AllItemValue << endl;
+
             out << endl;
             out.close();
 #endif
@@ -293,11 +297,11 @@ void Controller::RobotPull() {
         if (port[aimport].arrive(robot[i].nowx, robot[i].nowy)) {
             port[aimport].pull(robot[i].carryItem.value);
             robot[i].pull();
-#ifdef LOG
+#ifdef DEBUG
             TotalPullCount ++; // maintain this variable
             TotalPullValue += robot[i].carryItem.value; // maintain this variable
-            int Value = robot[i].carryItem.value;
-            AllValue[Value].insert(NowFrame); // maintain this variable
+            // int Value = robot[i].carryItem.value;
+            // AllValue[Value].insert(NowFrame); // maintain this variable
 #endif
         }
     }

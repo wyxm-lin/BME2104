@@ -50,8 +50,8 @@ void Robot::update(int x, int y, bool carry, bool available, int frameID) {
 
 bool Robot::UnableTakeOrder() { // FIXME how to define UnableTakeOrder
     if (IsAvailable == false) return true;
-    if (IsWorking == true) return true;
-    // if (IsCarry == true) return true;
+    // if (IsWorking == true) return true;
+    if (IsCarry == true) return true;
 
     // NOTE if we allow the robot to switch order, isworking zhu-shi-diao, iscarry bu-yao-zhu-shi
     // NOTE remember to release the original order, if switching order
