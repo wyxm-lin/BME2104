@@ -239,6 +239,7 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
             }
 
             if (robot[i].IsWorking == true) {
+#ifdef DEBUG
                 using std::fstream;
                 using std::endl;
                 fstream out;
@@ -247,6 +248,7 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
                 out << "Robot Id:" << i << endl << endl;
                 // out << 
                 out.close();
+#endif
             }
 
             if (ItemMap[px][py].isbooked()) {
