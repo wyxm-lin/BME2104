@@ -20,7 +20,7 @@
 #include <set>
 #include <thread>
 
-// #define LOG
+#define LOG
 #define DEBUG
 
 const int RobotNumber = 10; // the number of robot
