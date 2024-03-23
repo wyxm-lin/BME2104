@@ -9,6 +9,21 @@ using std::vector;
 
 extern vector <int> portShutDown;
 
+void ShipMoveDecision(Port (&port)[PortNumber], Ship (&ship)[ShipNumber]) {
+    vector <Port> ports;
+    for(int i = 0; i < PortNumber; i++) {
+        ports.push_back(port[i]);
+    }
+    sort(ports.begin(), ports.end(), [=](const Port &a, const Port &b) -> bool {return a.T < b.T;});
+    for(int i = 0; i < ShipNumber; i++) {
+        ship[i].FixedTurnAim[2] = ports[i].id;
+        ship[i].FixedTurnAim[1] = ports[PortNumber - i - 1].id;
+        int RestFrame = TurnFrame - ports[i].T - ports[PortNumber - i - 1].T - 500 - 2;
+        ship[i].WaitTime[1] = RestFrame / 2;
+        ship[i].WaitTime[2] = RestFrame - ship[i].WaitTime[1];
+    }
+}
+
 void GenerateShipOrders(Port (&port)[PortNumber], Ship (&ship)[ShipNumber], int NowFrame){
     priority_queue <ShipOrder> shipOrder;
     for(int i = 0; i < PortNumber; i++){

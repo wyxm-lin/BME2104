@@ -82,6 +82,8 @@ public:
     void ShipMoveNew();
     void AutoShipLoadNew();
 
+    void ShipMoveInFixTurn();
+
     /**********************not use in this project********************************/
     void RobotUnavailableSearchNewPath();
 };
