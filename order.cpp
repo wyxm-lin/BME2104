@@ -56,6 +56,12 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
     vector <Order> ords[RobotNumber];
     AllItemAveValue = ((double)AllItemValue) / AllItemNum; // calculate the average value of all generated items
 
+    thread t[2];
+    t[0] = thread(RobotDisUpdateBatch, robot, 0, RobotNumber / 2 - 1);
+    t[1] = thread(RobotDisUpdateBatch, robot, RobotNumber / 2, RobotNumber - 1);
+    for (int i = 0; i < 2; i++) {
+        t[i].join();
+    }
 
     while (Q.size()) {
         int x = Q.front().first, y = Q.front().second;
@@ -93,7 +99,8 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
                 Order ord;
                 ord.DisItemToPort = PortGetDis(x, y, aimport); // exact distance from item to port
                 if (robot[i].IsWorking == false || robot[i].oldPort == -1) {
-                    ord.DisRobotToItem = RobotGetDis(x, y, i, robot[i].nowx, robot[i].nowy); // use A* searth
+                    // ord.DisRobotToItem = RobotGetDis(x, y, i, robot[i].nowx, robot[i].nowy); // use A* searth
+                    ord.DisRobotToItem = RobotGetDis(x, y, i); // use BFS searth
                 }
                 else {
                     ord.DisRobotToItem = PortGetDis(x, y, robot[i].oldPort);
@@ -150,7 +157,8 @@ void GenerateOrdersNew(Robot (&robot)[RobotNumber], queue <pair<int, int>> Q, Po
 
 
             if(robot[i].IsWorking) { // order-switch
-                if(ord.it.value <= robot[i].carryItem.value || RobotGetDis(ord.it.x, ord.it.y, i, robot[i].nowx, robot[i].nowy) >= RobotGetDis(robot[i].carryItem.x, robot[i].carryItem.y, i, robot[i].nowx, robot[i].nowy)) {
+                // if(ord.it.value <= robot[i].carryItem.value || RobotGetDis(ord.it.x, ord.it.y, i, robot[i].nowx, robot[i].nowy) >= RobotGetDis(robot[i].carryItem.x, robot[i].carryItem.y, i, robot[i].nowx, robot[i].nowy)) {
+                if(ord.it.value <= robot[i].carryItem.value || RobotGetDis(ord.it.x, ord.it.y, i) >= RobotGetDis(robot[i].carryItem.x, robot[i].carryItem.y, i)) {
                     continue;
                 }
                 
