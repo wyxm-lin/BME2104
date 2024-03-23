@@ -103,7 +103,7 @@ void Controller::PreProcess() {
     for (int id = 0; id < RobotNumber; id++) {
         RobotDisUpdate(robot[id].nowx, robot[id].nowy, id);
     }
-    ShipMoveDecision(port, ship);
+    // ShipMoveDecision(port, ship);
 }
 
 void Controller::RunByFrame() {
@@ -149,7 +149,7 @@ void Controller::RunByFrame() {
                 GenerateOrdersNew(robot, ItemPosList, port, ItemMap, NowFrame);
                 // GenerateOrdersVersion4(robot, ItemPosList, port, ItemMap, NowFrame);
                 RobotGet();
-                // avoidCollison(robot, atlas); // NOTE this function 
+                avoidCollison(robot); // NOTE this function 
                 RobotMove();
             }   
 
@@ -165,11 +165,9 @@ void Controller::RunByFrame() {
             // }
         }
         
-        // AutoShipLoad();
-        // // ShipSchedule();
-        // GenerateShipOrdersNew(port, ship, NowFrame);
-        // ShipMoveNew();
-        ShipMoveInFixTurn();
+        GenerateShipOrdersNew(port, ship, NowFrame);
+        ShipMoveNew();
+        // ShipMoveInFixTurn();
         AutoShipLoadNew();
     
         {

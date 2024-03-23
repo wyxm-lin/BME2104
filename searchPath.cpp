@@ -43,7 +43,7 @@ void avoidCollison(Robot (&robot)[RobotNumber]) {
     // check max search time
     int SearchMaxTime = 0;
     for(int i=0; i<RobotNumber; i++){
-        if(robot[i].pathWithTime.size() > SearchMaxTime){
+        if(robot[i].pathWithTime.size() < SearchMaxTime){
             SearchMaxTime = robot[i].pathWithTime.size();
         }
     }
