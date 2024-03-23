@@ -145,7 +145,8 @@ void Controller::RunByFrame() {
             {
                 // origin version
                 RobotPull();
-                GenerateOrdersNew(robot, ItemPosList, port, ItemMap, NowFrame);
+                // GenerateOrdersNew(robot, ItemPosList, port, ItemMap, NowFrame);
+                GenerateOrdersVersion4(robot, ItemPosList, port, ItemMap, NowFrame);
                 RobotGet();
                 // avoidCollison(robot, atlas); // NOTE this function 
                 RobotMove();
@@ -229,6 +230,22 @@ void Controller::RunByFrame() {
             out.close();
 #endif
         }
+
+#ifdef LOG
+    {
+        if(NowFrame == 15000){
+            fstream out;
+            out.open("robotPath.txt", std::ios::app);
+            for(int i = 0; i < RobotNumber; i++){
+                out << "Robot " << i << " path size is " << robotPathSize[i].size() << endl;
+                for(int j = 0; j < robotPathSize[i].size(); j++){
+                    out << robotPathSize[i][j].first.first << " " << robotPathSize[i][j].first.second << " " << robotPathSize[i][j].second << endl;
+                }
+            }
+            out.close();
+        }
+    }
+#endif
 
         printf("OK\n");
         fflush(stdout);
