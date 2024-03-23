@@ -68,24 +68,12 @@ public:
     void RobotRealGet();
 
     /**
-     * @brief Maintain port items and ship items and such things
-     */
-    void AutoShipLoad();
-    
-
-    /**
      * @brief Operate ship movements
      */
-    void ShipMoveOrSell();
-    void ShipSchedule();
-
     void ShipMoveNew();
     void AutoShipLoadNew();
-
     void ShipMoveInFixTurn();
 
-    /**********************not use in this project********************************/
-    void RobotUnavailableSearchNewPath();
 };
 
 #endif

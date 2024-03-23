@@ -146,8 +146,8 @@ void Controller::RunByFrame() {
             {
                 // origin version
                 RobotPull();
-                // GenerateOrdersNew(robot, ItemPosList, port, ItemMap, NowFrame);
-                GenerateOrdersVersion4(robot, ItemPosList, port, ItemMap, NowFrame);
+                GenerateOrdersNew(robot, ItemPosList, port, ItemMap, NowFrame);
+                // GenerateOrdersVersion4(robot, ItemPosList, port, ItemMap, NowFrame);
                 RobotGet();
                 // avoidCollison(robot, atlas); // NOTE this function 
                 RobotMove();
@@ -166,7 +166,7 @@ void Controller::RunByFrame() {
         }
         
         // AutoShipLoad();
-        // ShipSchedule();
+        // // ShipSchedule();
         // GenerateShipOrdersNew(port, ship, NowFrame);
         // ShipMoveNew();
         ShipMoveInFixTurn();
@@ -416,120 +416,6 @@ void Controller::RobotMove() {
     }
 }
 
-void Controller::AutoShipLoad() {
-    for (int i = 0; i < ShipNumber; i++) {
-        if (ship[i].status == SHIPPING) {
-            if (ship[i].afterSell) {  // at the virtual point
-                continue;
-            }
-            int portId = ship[i].target;
-            int v = port[portId].velocity;
-            int actualLoadCnt;  // change if the ship is full or port is empty
-            if ((ship[i].HaveLoad + v <= ship[i].capacity) && (port[portId].nowItemCnt - v > 0)) {    // ship not full and port not empty NOTE this have a bug
-                ship[i].HaveLoad += v;
-                actualLoadCnt = v;
-            } 
-            else if ((ship[i].HaveLoad + v > ship[i].capacity) || (port[portId].nowItemCnt - v <= 0)){  // ship full or port empty
-                int shipRemain = ship[i].capacity - ship[i].HaveLoad;
-                int portRemain = port[portId].nowItemCnt;
-                if (shipRemain == portRemain) { // ship full & port empty
-                    ship[i].HaveLoad = ship[i].capacity;
-                    ship[i].shipFull = true;
-                    ship[i].finishLoad = true;
-                    actualLoadCnt = portRemain;
-                }
-                else if (shipRemain < portRemain) { // ship full & port not empty
-                    ship[i].HaveLoad = ship[i].capacity;
-                    ship[i].shipFull = true;
-                    actualLoadCnt = shipRemain;
-                }
-                else {                              // port empty & ship not full
-                    ship[i].HaveLoad += portRemain;
-                    actualLoadCnt = portRemain;
-                    ship[i].finishLoad = true;
-                }
-            }
-            port[portId].load(actualLoadCnt); // modify the port's nowItemCnt
-        }
-    }
-}
-
-void Controller::ShipMoveOrSell() {
-    for (int i = 0; i < ShipNumber; i++) {
-        if (ship[i].status == SHIPPING) {
-            if (ship[i].shipFull) {
-                ship[i].Sell();
-                continue;
-            }
-            if (ship[i].afterSell) {  // start at the virtual point
-                ship[i].afterSell = false;
-                if (ship[i].aimPort == -1) {  // no port to go, mainly because it's the last frames
-                    continue;
-                }
-                ship[i].MoveToPort(ship[i].aimPort);
-            } 
-            else {    // start at a ship[i].target port
-                if (ship[i].aimPort == -1) {  // no port to go, don't think it will happen
-                    ship[i].Sell();
-                    continue;
-                }
-                if (port[ship[i].target].T + NowFrame >= TotalFrame) {    // last frames
-                    ship[i].Sell();
-                    continue;
-                }
-                if (ship[i].aimPort != ship[i].target) {  // need to move to another port
-                    if (port[ship[i].aimPort].T + 500 + NowFrame >= TotalFrame) {
-                        ship[i].Sell();
-                    }
-                    else{
-                        ship[i].MoveToPort(ship[i].aimPort);
-                    }
-                }
-            }
-        }
-        else if(ship[i].status == MOVING) {
-            // do nothing
-        }
-        else if(ship[i].status == WAITING) {
-            // do nothing
-        }
-    }
-}
-
-void Controller::ShipSchedule(){
-    if (NowFrame == 1) {
-        // TODO maybe need to change the strategy
-        for (int i = 0; i < ShipNumber; i++) {
-            ship[i].aimPort = i;
-            port[i].isbooked = true;
-        }
-        return;
-    }
-
-    if (NowFrame == FrameLastTimeHandle) { // TODO think twice
-        HandleLastFrames(port, ship, NowFrame);
-    }
-
-#ifdef LOG
-    {
-       if(NowFrame == FrameLastTimeHandle + 1){
-
-            fstream out;
-            out.open("port.txt", std::ios::app);
-            for(int i = 0; i < PortNumber; i++){
-                out << port[i].isopen() << " ";
-            }
-            out << endl;
-            out.close();
-        }
-    }
-#endif
-
-    GenerateShipOrders(port, ship, NowFrame);
-    ShipMoveOrSell();
-    return;
-}
-
 void Controller::ShipMoveNew() {
     for (int i = 0; i < ShipNumber; i++) {
         if (ship[i].FromPortToVirtual == true || ship[i].FromVirtualToPort || ship[i].FromPortToPort == true) {
@@ -593,22 +479,6 @@ void Controller::AutoShipLoadNew() {
             }
             else {
                 ship[i].ShouldLeaveNowPort = false;
-            }
-        }
-    }
-}
-
-/*****************************not use in this project****************************/
-void Controller::RobotUnavailableSearchNewPath() {
-    for (int i = 0; i < RobotNumber; i++) {
-        if (robot[i].IsAvailable == false) {
-            if (robot[i].UnavailableMoment == 0) {
-                robot[i].UnavailableMoment = NowFrame;
-                AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search new path because this robot is unavailable
-            }
-            else if (robot[i].UnavailableMoment + 20 <= robot[i].NowFrame) { // new crash occured
-                robot[i].UnavailableMoment += 10; // FIXME estimate after 10 frames, a new crash occured
-                AstarTimeEpsilonWithConflict(robot[i], EPSILON, robot); // search new path because a new crash occured
             }
         }
     }
