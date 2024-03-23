@@ -35,6 +35,9 @@ public:
     int LeaveVirtualPointFrame; // the frame that the ship should leave the virtual point
     int oldTarget = -1; // the old pos of the ship (used for log)
 
+    int FixedTurnAim[2]; // when the ship goes to the ports for fixed times, it has two fixed aim port
+    int WaitTime[2]; // wait at the port time
+
     Ship():id(-1), capacity(-1), target(-1), aimPort(-1), status(ShipStatus::SHIPPING), HaveLoad(0) {}
     ~Ship() = default;
 

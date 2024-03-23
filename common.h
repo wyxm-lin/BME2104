@@ -36,6 +36,7 @@ const int CONSTDELTA = 500; // FIXME
 const int TotalFrame = 15000;
 const double EPSILON = 1.0;
 const int FrameLastTimeHandle = 12000;
+const int TurnFrame = 3000;
 
 enum MapStatus {
     EMPTY = 0, // empty areas

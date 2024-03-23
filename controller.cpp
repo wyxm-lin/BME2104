@@ -103,6 +103,7 @@ void Controller::PreProcess() {
     for (int id = 0; id < RobotNumber; id++) {
         RobotDisUpdate(robot[id].nowx, robot[id].nowy, id);
     }
+    ShipMoveDecision(port, ship);
 }
 
 void Controller::RunByFrame() {
@@ -166,8 +167,9 @@ void Controller::RunByFrame() {
         
         // AutoShipLoad();
         // ShipSchedule();
-        GenerateShipOrdersNew(port, ship, NowFrame);
-        ShipMoveNew();
+        // GenerateShipOrdersNew(port, ship, NowFrame);
+        // ShipMoveNew();
+        ShipMoveInFixTurn();
         AutoShipLoadNew();
     
         {
@@ -550,6 +552,22 @@ void Controller::ShipMoveNew() {
             }
         }
     }
+}
+
+void Controller::ShipMoveInFixTurn() {
+    int FrameInTurn = (NowFrame - 1) % TurnFrame + 1;
+    for(int i = 0; i < ShipNumber; i++) {
+        if(FrameInTurn == 1) {
+            printf("ship %d %d\n", i, ship[i].FixedTurnAim[1]);
+        }
+        if(FrameInTurn == port[ship[i].FixedTurnAim[1]].T + ship[i].WaitTime[1] + 1) {
+            printf("ship %d %d\n", i, ship[i].FixedTurnAim[2]);
+        }
+        if(FrameInTurn == port[ship[i].FixedTurnAim[1]].T + ship[i].WaitTime[1] + 501 + ship[i].WaitTime[2]) {
+            printf("go %d\n", i);
+        }
+    }
+    fflush(stdout);
 }
 
 void Controller::AutoShipLoadNew() {
