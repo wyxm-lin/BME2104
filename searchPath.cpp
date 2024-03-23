@@ -17,6 +17,8 @@ extern int color[MapSize][MapSize];
 extern vector <pair<pair<int, int>, int> > robotPathSize[RobotNumber];
 extern vector <pair<int, int>> robotItemValue[RobotNumber];
 
+extern int collision_cnt;
+
 void SearchPath(Robot &robot) {
     AstarTimeEpsilon(robot, 1.0); // FIXME epsilon value
 }
@@ -41,7 +43,7 @@ void avoidCollison(Robot (&robot)[RobotNumber]) {
     bitsetReset(passThrough, robot);
 
     // check max search time
-    int SearchMaxTime = 0;
+    int SearchMaxTime = 500;
     for(int i=0; i<RobotNumber; i++){
         if(robot[i].pathWithTime.size() < SearchMaxTime){
             SearchMaxTime = robot[i].pathWithTime.size();
@@ -70,7 +72,7 @@ void avoidCollison(Robot (&robot)[RobotNumber]) {
 
             if (passThrough[robot[i1].pathWithTime[p1].x][robot[i1].pathWithTime[p1].y].count() > 1) { // space conflict, time conflict maybe not exist
                 // robot path search index
-
+                collision_cnt++;
                 // timeNin is the time when the robot enter the area
                 // timeNout is the time when the robot leave the area but STILL IN the area
                 int time1in = p1, time1out = p1, time2in = 0, time2out = 0;
@@ -122,6 +124,16 @@ void avoidCollison(Robot (&robot)[RobotNumber]) {
                     && time1out != time2out) {
                     continue;
                 }
+
+#ifdef COLLISION_DEBUG   
+    {
+        fstream fs;
+        fs.open("avoidCollision.txt", std::ios::app);
+        fs << robot[0].NowFrame << " Collision: " << i1 << " " << i2 << " " << time1in << " " << time1out << " " << time2in << " " << time2out << std::endl;
+        fs.close();
+    }
+
+#endif
 
 
                 // // if collision in time
@@ -244,7 +256,7 @@ void AstarTimeEpsilonWithConflict(Robot &robot, double epsilon, Robot (&otherRob
             break;
         }
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             int nextX = x + dx[i], nextY = y + dy[i], NextTime = Time + 1;
             if (valid(nextX, nextY) == false) {
                 continue;

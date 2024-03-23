@@ -22,8 +22,11 @@ int main() {
     out.close();
     out.open("avoidCollision.txt", ios::out);
     out.close();
+    out.open("seed.txt", ios::out);
+    out.close();
     Controller BME2104;
     BME2104.Init();
-    BME2104.RunByFrame();
+    BME2104.InterStellar();
+    // BME2104.RunByFrame();
     return 0;
 }

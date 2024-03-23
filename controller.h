@@ -74,6 +74,8 @@ public:
     void AutoShipLoadNew();
     void ShipMoveInFixTurn();
 
+    void InterStellar();
+
 };
 
 #endif

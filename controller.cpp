@@ -31,6 +31,9 @@ int TotalPullValue = 0;
     vector <int> portShutDown;
     /*above are used for debug*/
 #endif
+#ifdef COLLISION_DEBUG
+    int collision_cnt;
+#endif
 
 extern MapStatus atlas[MapSize][MapSize];
 
@@ -106,6 +109,84 @@ void Controller::PreProcess() {
     // ShipMoveDecision(port, ship);
 }
 
+string intToA(int n,int radix)    //n是待转数字，radix是指定的进制
+{
+	string ans="";
+	do{
+		int t=n%radix;
+		if(t>=0&&t<=9)	ans+=t+'0';
+		else ans+=t-10+'a';
+		n/=radix;
+	}while(n!=0);	//使用do{}while（）以防止输入为0的情况
+	reverse(ans.begin(),ans.end());
+	return ans;	
+}
+                    
+
+void Controller::InterStellar(){
+    int nowamoney = 0;
+    while(NowFrame < FrameLimit) {
+        cin >> NowFrame >> nowamoney;
+        ItemUpdateByFrame();
+
+        for(int i = 0; i < RobotNumber; i++) {
+            int carry, x, y, status;
+            cin >> carry >> x >> y >> status;
+            robot[i].update(x, y, carry, status, NowFrame);
+        }
+        // Robots Data Update
+
+        for(int i = 0; i < ShipNumber; i++) {
+            int status, tarid;
+            cin >> status >> tarid;
+            ship[i].update((ShipStatus)status, tarid, NowFrame);
+            // ship[i].NowFrame = NowFrame;
+            // the status is accordingly assigned to integers, in 'common.h'
+        }
+        // Ship Data Update
+        string OKstring;
+        cin >> OKstring;
+        // Read 'OK'
+
+        // if(NowFrame == 2){
+        //     int cap = ship[0].capacity;
+
+        //     string binary_cap = intToA(cap, 2);
+
+        //     // fstream file;
+        //     // file.open("seed.txt", std::ios::app);
+        //     // file << cap << endl;
+        //     // file << binary_cap << endl;
+        //     // file.close();
+
+        //     for(int i = 0; i < binary_cap.size(); i++) {
+        //         if(binary_cap[i] == '1') {
+        //             cout << "move " << i << " 1" << endl;
+        //         }else{
+        //             cout << "move " << i << " 0" << endl;
+        //         }
+        //     }
+        // }
+        if(NowFrame == 2){
+            int T = port[1].T;
+
+            string binary_T = intToA(T, 2);
+
+
+            for(int i = 0; i < binary_T.size(); i++) {
+                if(binary_T[i] == '1') {
+                    cout << "move " << i << " 1" << endl;
+                }else{
+                    // cout << "move " << i << " 0" << endl;
+                }
+            }
+        }
+
+        printf("OK\n");
+        fflush(stdout);
+    }
+}
+
 void Controller::RunByFrame() {
     int nowamoney = 0;
     while(NowFrame < FrameLimit) {
@@ -158,7 +239,7 @@ void Controller::RunByFrame() {
             //     RobotRealPull(); // when the robot real get the pos, switch state
             //     GenerateOrdersNew(robot, ItemPosList, port, ItemMap, NowFrame);
             //     RobotRealGet(); // when the robot real get the pos, switch state
-            //     // avoidCollison(robot, atlas); // NOTE this function 
+            //     avoidCollison(robot); // NOTE this function 
             //     RobotMove();
             //     RobotFakePull();
             //     RobotFakeGet();
@@ -242,6 +323,16 @@ void Controller::RunByFrame() {
                     out << robotPathSize[i][j].first.first << " " << robotPathSize[i][j].first.second << " " << robotPathSize[i][j].second << endl;
                 }
             }
+            out.close();
+        }
+    }
+#endif
+#ifdef COLLISION_DEBUG
+    {
+        if(NowFrame == 15000){
+            fstream out;
+            out.open("avoidCollision.txt", std::ios::app);
+            out << "collision_cnt is " << collision_cnt << endl;
             out.close();
         }
     }
